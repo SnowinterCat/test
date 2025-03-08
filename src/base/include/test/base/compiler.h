@@ -1,0 +1,13 @@
+#ifndef _TEST_COMPILER_H_
+#define _TEST_COMPILER_H_
+
+#ifdef _MSVC_LANG
+    #ifndef _CRT_SECURE_NO_WARNINGS
+        #define _CRT_SECURE_NO_WARNINGS
+    #endif
+    #ifndef _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING
+        #define _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING
+    #endif
+#endif
+
+#endif

@@ -4,4 +4,5 @@
 /build/
 /vs*/
 
+config.h
 .clang-format

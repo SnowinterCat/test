@@ -73,8 +73,8 @@ add_requires(
     "out_ptr"
 )
 -- normal libraries
-add_requires("libsdl3", {configs = {shared = is_config("3rd_kind", "shared")}})
-add_requires("spdlog", {configs = {shared = is_config("3rd_kind", "shared"), header_only = false, fmt_external = true, wchar = true, wchar_console = true}})
+-- add_requires("libsdl3", {override = true, version = "3.x.x", configs = {shared = is_config("3rd_kind", "shared")}})
+add_requires("spdlog", {override = true, version = "1.x.x", configs = {shared = is_config("3rd_kind", "shared"), header_only = false, fmt_external = true, wchar = true, wchar_console = true}})
 -- normal libraries' dependencies configurations
 add_requireconfs("**.fmt", {override = true, version = "11.0.x", configs = {shared = is_config("3rd_kind", "shared"), header_only = false}})
 
