@@ -1,6 +1,6 @@
 #pragma once
 
-#include "test/base/base_library.h"
+#include "test/core/core_library.h"
 
 #include <string>
 #include <vector>

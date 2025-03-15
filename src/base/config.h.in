@@ -1,9 +1,9 @@
 #ifndef _TEST_CONGIG_H_
 #define _TEST_CONGIG_H_
 
-#include "test/base/os.h"
-#include "test/base/host.h"
-#include "test/base/compiler.h"
+#include "os.h"
+#include "host.h"
+#include "compiler.h"
 
 #define TEST_VERSION "${VERSION}"
 #define TEST_VERSION_MAJOR "${VERSION_MAJOR}"
