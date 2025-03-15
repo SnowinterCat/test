@@ -1,4 +1,4 @@
-#include "test/config.h"
+#include <test/config.h>
 #include "test/core/environment.hpp"
 
 #include <codecvt>

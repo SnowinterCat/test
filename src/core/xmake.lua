@@ -6,7 +6,7 @@ target("core")
     -- add_packages("spdlog")
 
     add_includedirs("include", {public = true})
-    add_headerfiles("include/(**.hpp)", "include/(**.h)")
+    add_headerfiles("include/(**)")
     -- add_headerfiles("src/(**.hpp)", {install = false})
     add_files("src/**.cpp")
 
