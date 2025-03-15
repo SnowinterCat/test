@@ -25,40 +25,8 @@ option("outputdir")
     end)
 option_end()
 
--- 编译规则
-rule("target.autoclean")
-    after_build(function (target)
-        os.tryrm(target:targetdir() .. "/" .. target:basename() .. ".exp")
-        os.tryrm(target:targetdir() .. "/" .. target:basename() .. ".ilk")
-        os.tryrm(target:targetdir() .. "/compile." .. target:basename() .. ".pdb")
-    end)
-rule_end()
-
-rule("target.autoname")
-    on_load(function (target)
-        function Camel(str)
-            return str:sub(1, 1):upper() .. str:sub(2)
-        end
-        import("core.project.project")
-        target:set("basename", Camel(project:name()) .. Camel(target:name()))
-    end)
-rule_end()
-
-rule("library.autodefine")
-    before_build(function (target)
-        import("core.project.project")
-        local projNameUpper = string.upper(project.name())
-        local targNameUpper = string.upper(target:name())
-        if target:kind() == "shared" then
-            target:add("defines", projNameUpper .. "_" .. targNameUpper .. "_DLL")
-        end
-        target:add("defines", projNameUpper .. "_" .. targNameUpper .. "_EXPORTS")
-    end)
-rule_end()
-
 -- 隐藏设置与规则
 includes("lua/hideoptions.lua")
-includes("lua/hiderules.lua")
 includes("lua/hidetargets.lua")
 
 -- 第三方库依赖
@@ -73,8 +41,8 @@ add_requires(
     "out_ptr"
 )
 -- normal libraries
--- add_requires("libsdl3", {override = true, version = "3.x.x", configs = {shared = is_config("3rd_kind", "shared")}})
-add_requires("spdlog", {override = true, version = "1.x.x", configs = {shared = is_config("3rd_kind", "shared"), header_only = false, fmt_external = true, wchar = true, wchar_console = true}})
+-- add_requires("libsdl3", {version = "3.x.x", configs = {shared = is_config("3rd_kind", "shared")}})
+add_requires("spdlog", {version = "1.x.x", configs = {shared = is_config("3rd_kind", "shared"), header_only = false, fmt_external = true, wchar = true, wchar_console = true}})
 -- normal libraries' dependencies configurations
 add_requireconfs("**.fmt", {override = true, version = "11.0.x", configs = {shared = is_config("3rd_kind", "shared"), header_only = false}})
 

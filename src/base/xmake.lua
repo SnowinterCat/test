@@ -3,7 +3,6 @@ target("base")
     set_targetdir("$(libdir)")
 
     -- add_deps("base")
-    add_rules("target.autoclean", "target.autoname", "library.autodefine")
     -- add_packages("spdlog")
 
     add_includedirs("include", {public = true})
@@ -13,4 +12,14 @@ target("base")
 
     set_configdir("include/test/base")
     add_configfiles("config.h.in", {public = true})
+
+    on_load(function (target) 
+        import("lua.auto", {rootdir = os.projectdir()})
+        auto().target_autoname(target)
+        auto().library_autodefine(target)
+    end)
+    after_build(function (target) 
+        import("lua.auto", {rootdir = os.projectdir()})
+        auto().target_autoclean(target)
+    end)
 target_end()
