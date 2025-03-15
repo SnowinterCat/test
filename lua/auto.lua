@@ -30,7 +30,9 @@ function autofunc.library_autodefine(target)
 end
 
 function autofunc.binary_autoluanch(target)
-    print(target:name() .. " auto luanch")
+    local proj_luancher = project.target("luancher")
+    local luancher = path.join(target:targetdir(), target:basename() .. (is_plat("windows", "mingw") and ".exe" or ""))
+    os.cp(proj_luancher:targetfile(), luancher)
 end
 
 function main()

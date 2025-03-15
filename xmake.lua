@@ -15,6 +15,7 @@ add_rules("plugin.compile_commands.autoupdate", {lsp = "clangd", outputdir = ".v
 -- 编译设置
 option("3rd_kind",     {showmenu = true, default = "shared", values = {"static", "shared"}})
 option("buildversion", {showmenu = true, default = "0", type = "string"})
+option("use_luancher", {showmenu = true, default = false, type = "boolean"})
 
 option("outputdir")
     set_showmenu(true)
