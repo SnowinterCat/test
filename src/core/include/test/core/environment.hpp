@@ -19,7 +19,7 @@ TEST_BEGIN
  * 非空，则转换后的内容会接在原内容之后，但原内容不会被当作参数。不建议出于此目的使用该函数，此功能仅为了保证当
  * args 非空时也能正常工作
  */
-TEST_BASE_API char **convert_argc_argv(size_t argc, const wchar_t *const *wargv, std::string &args,
+TEST_CORE_API char **convert_argc_argv(size_t argc, const wchar_t *const *wargv, std::string &args,
                                        std::vector<char *> &argvector);
 
 /**
@@ -28,9 +28,9 @@ TEST_BASE_API char **convert_argc_argv(size_t argc, const wchar_t *const *wargv,
  * @param str
  * @param argc
  * @param argvector
- * @return TEST_BASE_API
+ * @return std::string
  */
-TEST_BASE_API std::string string_to_argc_argv(const std::string &str, int &argc,
+TEST_CORE_API std::string string_to_argc_argv(const std::string &str, int &argc,
                                               std::vector<const char *> &argvector);
 
 TEST_END

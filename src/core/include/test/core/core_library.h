@@ -1,20 +1,20 @@
 
-#ifndef _TEST_BASE_LIBRARY_H_
-#define _TEST_BASE_LIBRARY_H_
+#ifndef _TEST_CORE_LIBRARY_H_
+#define _TEST_CORE_LIBRARY_H_
 
-#if defined(_WIN32) && defined(TEST_BASE_DLL)
-    #if defined(TEST_BASE_EXPORTS)
-        #define TEST_BASE_API __declspec(dllexport)
+#if defined(_WIN32) && defined(TEST_CORE_DLL)
+    #if defined(TEST_CORE_EXPORTS)
+        #define TEST_CORE_API __declspec(dllexport)
     #else
-        #define TEST_BASE_API __declspec(dllimport)
+        #define TEST_CORE_API __declspec(dllimport)
     #endif
 #endif
 
-#if !defined(TEST_BASE_API)
+#if !defined(TEST_CORE_API)
     #if defined(__GNUC__) && (__GNUC__ >= 4)
-        #define TEST_BASE_API __attribute__((visibility("default")))
+        #define TEST_CORE_API __attribute__((visibility("default")))
     #else
-        #define TEST_BASE_API
+        #define TEST_CORE_API
     #endif
 #endif
 

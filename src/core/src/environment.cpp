@@ -1,5 +1,5 @@
-#include "test/base/config.h"
-#include "test/base/environment.hpp"
+#include "test/config.h"
+#include "test/core/environment.hpp"
 
 #include <codecvt>
 #include <locale>
