@@ -32,7 +32,7 @@ includes("lua/hidetargets.lua")
 
 -- 第三方库依赖
 -- some third-libraries use our own configurations
-add_repositories("myrepo 3rd", {rootdir = os.scriptdir()})
+-- add_repositories("myrepo 3rd", {rootdir = os.scriptdir()})
 -- header-only libraries
 add_requires(
     -- tools
