@@ -15,18 +15,12 @@ bool add_environment_value(const char *name, std::string_view value);
 
 int main([[maybe_unused]] int argc, [[maybe_unused]] const char *const *argv)
 {
-    // std::cout << std::format("LD_LIBRARY_PATH={}", getenv("LD_LIBRARY_PATH")) << std::endl;
     if (!check_environment_value("LD_LIBRARY_PATH", ".")) {
         add_environment_value("LD_LIBRARY_PATH", ".");
-        int pid = fork();
+        int pid = vfork(), stat;
         if (pid) {
-            std::cout << "父进程" << std::endl;
-            // Todo: 修改 wait()
-            int stat;
-            wait(&stat);
-            return 0;
+            return wait(&stat) != pid;
         }
-        std::cout << "子进程" << std::endl;
         int errc = execve(argv[0], const_cast<char *const *>(argv), environ);
         std::cout << std::format("启动失败, code: {}", errc);
     }
