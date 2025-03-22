@@ -21,6 +21,7 @@ option("outputdir",    {showmenu = true, default = "bin", type = "string"})
 -- 隐藏设置、隐藏目标、打包命令
 includes("lua/hideoptions.lua")
 includes("lua/hidetargets.lua")
+includes("lua/pack.lua")
 
 -- 第三方库依赖
 -- some third-libraries use our own configurations
