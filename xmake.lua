@@ -16,23 +16,15 @@ add_rules("plugin.compile_commands.autoupdate", {lsp = "clangd", outputdir = ".v
 option("3rd_kind",     {showmenu = true, default = "shared", values = {"static", "shared"}})
 option("buildversion", {showmenu = true, default = "0", type = "string"})
 option("use_luancher", {showmenu = true, default = false, type = "boolean"})
+option("outputdir",    {showmenu = true, default = "bin", type = "string"})
 
-option("outputdir")
-    set_showmenu(true)
-    on_check(function (option)
-        if not option:value() then
-            option:set_value(path.translate(vformat("$(projectdir)/bin", xmake)))
-        end
-    end)
-option_end()
-
--- 隐藏设置与规则
+-- 隐藏设置、隐藏目标、打包命令
 includes("lua/hideoptions.lua")
 includes("lua/hidetargets.lua")
 
 -- 第三方库依赖
 -- some third-libraries use our own configurations
--- add_repositories("myrepo 3rd", {rootdir = os.scriptdir()})
+add_repositories("myrepo 3rd", {rootdir = os.scriptdir()})
 -- header-only libraries
 add_requires(
     -- tools
@@ -42,7 +34,8 @@ add_requires(
     "out_ptr"
 )
 -- normal libraries
--- add_requires("libsdl3", {version = "3.x.x", configs = {shared = is_config("3rd_kind", "shared")}})
+add_requires("vulkansdk")
+add_requires("libsdl3", {version = "3.x.x", configs = {shared = is_config("3rd_kind", "shared")}})
 add_requires("spdlog", {version = "1.x.x", configs = {shared = is_config("3rd_kind", "shared"), header_only = false, fmt_external = true, wchar = true, wchar_console = true}})
 -- normal libraries' dependencies configurations
 add_requireconfs("**.fmt", {override = true, version = "11.0.x", configs = {shared = is_config("3rd_kind", "shared"), header_only = false}})

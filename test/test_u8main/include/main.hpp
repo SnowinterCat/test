@@ -1,6 +1,6 @@
 #pragma once
 
-// #include <test/config.h>
+#include <test/config.h>
 
 #if defined(_WIN32)
     #define TEST_EXPORT_API __declspec(dllexport)
@@ -13,4 +13,4 @@
     #endif
 #endif
 
-extern "C" int u8main(int argc, const char *const *argv);
+extern "C" TEST_EXPORT_API int u8main(int argc, const char *const *argv);
