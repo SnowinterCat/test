@@ -51,13 +51,6 @@ auto find_dynamic_library_directory(const char *baseName, std::filesystem::path 
     if (std::filesystem::is_regular_file(execDir / fileName, errc)) {
         return execDir;
     }
-
-    // auto buildTypeDir =
-    //     std::filesystem::relative(execDir, execDir.parent_path()); // $(arch)-$(kind)-$(runtimes)
-    // if (std::filesystem::is_regular_file(
-    //         execDir.parent_path().parent_path() / "lib" / buildTypeDir / fileName, errc)) {
-    //     return execDir.parent_path().parent_path() / "lib" / buildTypeDir;
-    // }
     return {};
 }
 

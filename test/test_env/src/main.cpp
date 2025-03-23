@@ -1,5 +1,11 @@
-#include <unistd.h>
-#include <sys/wait.h>
+#include <test/config.h>
+
+#if defined(_WIN32)
+    #include <Windows.h>
+#else
+    #include <unistd.h>
+    #include <sys/wait.h>
+#endif
 
 #include <format>
 #include <iostream>

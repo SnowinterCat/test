@@ -1,13 +1,50 @@
+#include <test/config.h>
 #include "luancher/main.hpp"
+
+#if defined(_WIN32)
+    #include <Windows.h>
+#endif
+
+#include <clocale>
+#include <string>
+#include <vector>
+
+////////////////////////////////////////////////////////////////////////////////
+// declaration
+////////////////////////////////////////////////////////////////////////////////
+
+#if defined(_WIN32)
+auto wargv_convert(int argc, const wchar_t *const *wargv, std::string &args,
+                   std::vector<const char *> &argvector) -> const char *const *;
+#endif
+
+////////////////////////////////////////////////////////////////////////////////
+// definition (header)
+////////////////////////////////////////////////////////////////////////////////
 
 #if defined(TEST_USE_LUANCHER) && TEST_USE_LUANCHER && !TEST_LUANCHER_EXPORTS
 #else
     #if defined(_WIN32)
-        #include <Windows.h>
+int wmain(int argc, const wchar_t *const *wargv)
+    #else
+int main(int argc, const char *const *argv)
+    #endif
+{
+    std::setlocale(LC_ALL, ".UTF-8");
+    #if defined(_WIN32)
+    auto        args      = std::string();
+    auto        argvector = std::vector<const char *>();
+    const auto *argv      = wargv_convert(argc, wargv, args, argvector);
+    #endif
+    return u8main(argc, argv);
+}
+#endif
 
-        #include <clocale>
-        #include <string>
-        #include <vector>
+////////////////////////////////////////////////////////////////////////////////
+// definition (source)
+////////////////////////////////////////////////////////////////////////////////
+
+#if defined(_WIN32)
 auto wargv_convert(int argc, const wchar_t *const *wargv, std::string &args,
                    std::vector<const char *> &argvector) -> const char *const *
 {
@@ -24,21 +61,4 @@ auto wargv_convert(int argc, const wchar_t *const *wargv, std::string &args,
     }
     return argvector.data();
 }
-
-int wmain(int argc, const wchar_t *const *wargv)
-{
-    std::setlocale(LC_ALL, ".UTF-8");
-    auto        args      = std::string();
-    auto        argvector = std::vector<const char *>();
-    const auto *argv      = wargv_convert(argc, wargv, args, argvector);
-    return u8main(argc, argv);
-}
-    #else
-        #include <clocale>
-int main(int argc, const char *const *argv)
-{
-    std::setlocale(LC_ALL, ".UTF-8");
-    return u8main(argc, argv);
-}
-    #endif
 #endif

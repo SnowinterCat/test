@@ -1,4 +1,5 @@
 #pragma once
+#include <test/config.h>
 
 /**
  * @brief
