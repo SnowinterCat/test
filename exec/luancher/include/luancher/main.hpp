@@ -1,5 +1,4 @@
 #pragma once
-
 #include <test/config.h>
 
 #if defined(_WIN32)

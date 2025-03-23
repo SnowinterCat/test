@@ -1,14 +1,16 @@
 #include <test/config.h>
-
+// 系统库
 #if !defined(_WIN32)
     #include <unistd.h>
     #include <sys/wait.h>
 #endif
-
+// 标准库
 #include <filesystem>
 #include <iostream>
 #include <format>
+// 三方库
 
+// 项目内依赖
 #include "luancher/main.hpp"
 #include "luanch.hpp"
 
@@ -35,7 +37,7 @@ int u8main([[maybe_unused]] int argc, [[maybe_unused]] const char *const *argv)
             return wait(&stat) != pid;
         }
         int errc = execve(argv[0], const_cast<char *const *>(argv), environ);
-        std::cout << std::format("启动失败, code: {}", errc);
+        std::cout << std::format("启动失败, code: {}", errc) << std::endl;
     }
 #endif
     return luanch_main(std::filesystem::path(argv[0]).stem().string().c_str(), argc, argv);
