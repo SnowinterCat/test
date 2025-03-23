@@ -81,14 +81,14 @@ int luanch_main(const char *baseName, int argc, const char *const *argv)
 
 #if defined(_WIN32)
     auto lib = std::unique_ptr<std::remove_pointer_t<HMODULE>, LibraryDeleter>(
-        LoadLibraryW((dllDir / baseName).c_str()));
+        LoadLibraryW(dllPath.c_str()));
     if (lib == nullptr) {
-        std::printf("%s", std::format("LoadLibraryW error, code: {}\n", GetLastError()).c_str());
+        std::cout << std::format("LoadLibraryW error, code: {}", GetLastError()) << std::endl;
         return GetLastError();
     }
     u8Main = reinterpret_cast<U8MAIN>(GetProcAddress(lib.get(), "u8main")); // NOLINT
     if (u8Main == nullptr) {
-        std::printf("%s", std::format("GetProcAddress error, code: {}\n", GetLastError()).c_str());
+        std::cout << std::format("GetProcAddress error, code: {}", GetLastError()) << std::endl;
         return GetLastError();
     }
 #else
