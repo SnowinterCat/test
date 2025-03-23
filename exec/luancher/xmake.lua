@@ -7,7 +7,7 @@ target("luancher")
 
     add_includedirs("include", {public = true})
     add_headerfiles("include/(**)")
-    -- add_headerfiles("src/(**.hpp)", {install = false})
+    add_headerfiles("src/(**.hpp)", {install = false})
     add_files("src/**.cpp", {public = true})
 
     on_load(function (target) 

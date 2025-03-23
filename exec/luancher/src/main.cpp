@@ -1,9 +1,29 @@
 #include <test/config.h>
 
+#if !defined(_WIN32)
+    #include <unistd.h>
+    #include <sys/wait.h>
+#endif
+
 #include <filesystem>
+#include <iostream>
+#include <format>
 
 #include "luancher/main.hpp"
 #include "luanch.hpp"
+
+////////////////////////////////////////////////////////////////////////////////
+// declaration
+////////////////////////////////////////////////////////////////////////////////
+
+#if !defined(_WIN32)
+bool check_environment_value(const char *name, std::string_view value);
+bool add_environment_value(const char *name, std::string_view value);
+#endif
+
+////////////////////////////////////////////////////////////////////////////////
+// definition
+////////////////////////////////////////////////////////////////////////////////
 
 int u8main([[maybe_unused]] int argc, [[maybe_unused]] const char *const *argv)
 {
@@ -22,3 +42,25 @@ int u8main([[maybe_unused]] int argc, [[maybe_unused]] const char *const *argv)
 }
 
 #include "luancher/main.cpp"
+
+#if !defined(_WIN32)
+bool check_environment_value(const char *name, std::string_view value)
+{
+    auto env = getenv(name);
+    if (env) {
+        auto strenv   = std::string(":").append(env).append(":");
+        auto strvalue = std::string(":").append(value).append(":");
+        return strenv.find(strvalue) != std::string::npos;
+    }
+    return false;
+}
+
+bool add_environment_value(const char *name, std::string_view value)
+{
+    auto env = getenv(name);
+    if (env) {
+        return setenv(name, std::string(env).append(":").append(value).c_str(), 1) == 0;
+    }
+    return setenv(name, value.data(), 1) == 0;
+}
+#endif
