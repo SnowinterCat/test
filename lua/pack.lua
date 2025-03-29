@@ -10,6 +10,7 @@ xpack("test")
     end
 xpack_end()
 
+if is_plat("windows", "mingw") or is_mode("releasedbg") then
 xpack("test_debug_symbol")
     if is_plat("windows", "mingw") then
         set_formats("zip")
@@ -19,3 +20,4 @@ xpack("test_debug_symbol")
         add_installfiles(path.join(os.projectdir(), get_config("outputdir")) .. "/(**.sym)", path.join(os.projectdir(), get_config("outputdir")) .. "/(**.a)")
     end
 xpack_end()
+end
