@@ -10,7 +10,9 @@ target("luancher")
     add_headerfiles("src/(**.hpp)", {install = false})
     add_files("src/**.cpp", {public = true})
 
-    -- add_runenvs("LD_LIBRARY_PATH", ".")
+    if has_config("luanch") then
+        add_runenvs("LD_LIBRARY_PATH", ".")
+    end
     on_load(function (target) 
         import("lua.auto", {rootdir = os.projectdir()})
         auto().library_autodefine(target)

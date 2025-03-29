@@ -112,9 +112,9 @@ int luanch_main(const char *baseName, int argc, const char *const *argv)
     }
 #endif
 
-    std::filesystem::current_path(execDir);
+    std::filesystem::current_path(execDir, errc);
     int result = u8Main(argc, argv);
-    std::filesystem::current_path(oldWorkPath);
+    std::filesystem::current_path(oldWorkPath, errc);
     return result;
 }
 
@@ -170,6 +170,14 @@ auto find_dynamic_library_path(const char *baseName, std::filesystem::path dir,
 #endif
     if (std::filesystem::is_regular_file(dir / fileName, errc)) {
         return dir / fileName;
+    }
+
+    auto traitPath = std::filesystem::relative(dir, dir.parent_path());
+    for (const auto &entry : std::filesystem::directory_iterator(dir.parent_path().parent_path())) {
+        if (entry.is_directory() &&
+            std::filesystem::is_regular_file(entry.path() / traitPath / fileName, errc)) {
+            return entry.path() / traitPath / fileName;
+        }
     }
     return {};
 }
