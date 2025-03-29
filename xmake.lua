@@ -16,7 +16,7 @@ add_rules("plugin.compile_commands.autoupdate", {lsp = "clangd", outputdir = ".v
 option("3rd_kind",     {showmenu = true, default = "shared", values = {"static", "shared"}})
 option("buildversion", {showmenu = true, default = "0", type = "string"})
 option("outputdir",    {showmenu = true, default = "bin", type = "string"})
-option("luanch",       {showmenu = true, default = nil, type = "string"})
+option("luanch",       {showmenu = true, default = nil, type = "string"})   -- 调试时，设置此值为要调试的组件名即可
 
 -- 隐藏设置、隐藏目标、打包命令
 includes("lua/hideoptions.lua")
