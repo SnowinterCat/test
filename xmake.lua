@@ -41,7 +41,6 @@ add_requires("spdlog", {version = "1.x.x", configs = {shared = is_config("3rd_ki
 -- normal libraries' dependencies configurations
 add_requireconfs("**.libxext", {system = true})     -- from libsdl3
 add_requireconfs("**.libx11", {system = true})      -- from libsdl3
-add_requireconfs("**.xorgproto", {system = true})   -- from libsdl3
 add_requireconfs("**.wayland", {system = true})     -- from libsdl3
 add_requireconfs("**.fmt", {override = true, version = "11.0.x", configs = {shared = is_config("3rd_kind", "shared"), header_only = false}})
 
