@@ -5,6 +5,8 @@
     #include <Windows.h>
 #else
     #include <dlfcn.h>
+    #include <unistd.h>
+    #include <sys/wait.h>
 #endif
 // 标准库
 #include <memory>
@@ -49,6 +51,12 @@ struct LibraryDeleter {
  */
 auto find_dynamic_library_path(const char *baseName, std::filesystem::path dir,
                                std::error_code &errc) -> std::filesystem::path;
+
+#if defined(_WIN32)
+#else
+bool check_environment_value(const char *name, std::string_view value);
+bool add_environment_value(const char *name, std::string_view value);
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 // definition (header)
@@ -110,6 +118,40 @@ int luanch_main(const char *baseName, int argc, const char *const *argv)
     return result;
 }
 
+#if defined(_WIN32)
+auto wargv_convert(int argc, const wchar_t *const *wargv, std::string &args,
+                   std::vector<const char *> &argvector) -> const char *const *
+{
+    int len = 0;
+    for (int i = 0; i < argc; ++i) {
+        len += WideCharToMultiByte(CP_UTF8, NULL, wargv[i], -1, NULL, NULL, NULL, NULL);
+    }
+    args.resize(len);
+
+    argvector.resize(argc);
+    for (int i = 0, cur = 0; i < argc; ++i) {
+        argvector[i] = &args[cur];
+        cur += WideCharToMultiByte(CP_UTF8, NULL, wargv[i], -1, &args[cur], len - cur, NULL, NULL);
+    }
+    return argvector.data();
+}
+#else
+bool check_add_environ_and_restart([[maybe_unused]] int argc, const char *const *argv,
+                                   const char *name, std::string_view value)
+{
+    if (!check_environment_value(name, value)) {
+        add_environment_value(name, value);
+        int pid = vfork(), stat;
+        if (pid) {
+            return wait(&stat) != pid;
+        }
+        int errc = execve(argv[0], const_cast<char *const *>(argv), environ);
+        std::cout << std::format("启动失败, code: {}", errc) << std::endl;
+    }
+    return true;
+}
+#endif
+
 ////////////////////////////////////////////////////////////////////////////////
 // definition (source)
 ////////////////////////////////////////////////////////////////////////////////
@@ -131,3 +173,26 @@ auto find_dynamic_library_path(const char *baseName, std::filesystem::path dir,
     }
     return {};
 }
+
+#if defined(_WIN32)
+#else
+bool check_environment_value(const char *name, std::string_view value)
+{
+    auto env = getenv(name);
+    if (env) {
+        auto strenv   = std::string(":").append(env).append(":");
+        auto strvalue = std::string(":").append(value).append(":");
+        return strenv.find(strvalue) != std::string::npos;
+    }
+    return false;
+}
+
+bool add_environment_value(const char *name, std::string_view value)
+{
+    auto env = getenv(name);
+    if (env) {
+        return setenv(name, std::string(env).append(":").append(value).c_str(), 1) == 0;
+    }
+    return setenv(name, value.data(), 1) == 0;
+}
+#endif

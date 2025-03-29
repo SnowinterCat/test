@@ -1,68 +1,28 @@
 #include <test/config.h>
-// 系统库
-#if !defined(_WIN32)
-    #include <unistd.h>
-    #include <sys/wait.h>
-#endif
-// 标准库
-#include <filesystem>
-#include <iostream>
-#include <format>
-// 三方库
 
-// 项目内依赖
-#include "luancher/main.hpp"
+#include <filesystem>
+
 #include "luanch.hpp"
 
-////////////////////////////////////////////////////////////////////////////////
-// declaration
-////////////////////////////////////////////////////////////////////////////////
-
-#if !defined(_WIN32)
-bool check_environment_value(const char *name, std::string_view value);
-bool add_environment_value(const char *name, std::string_view value);
+#if defined(_WIN32)
+int wmain(int argc, const wchar_t *const *wargv)
+#else
+int main(int argc, const char *const *argv)
 #endif
-
-////////////////////////////////////////////////////////////////////////////////
-// definition
-////////////////////////////////////////////////////////////////////////////////
-
-int u8main([[maybe_unused]] int argc, [[maybe_unused]] const char *const *argv)
 {
-#if !defined(_WIN32)
-    if (!check_environment_value("LD_LIBRARY_PATH", ".")) {
-        add_environment_value("LD_LIBRARY_PATH", ".");
-        int pid = vfork(), stat;
-        if (pid) {
-            return wait(&stat) != pid;
-        }
-        int errc = execve(argv[0], const_cast<char *const *>(argv), environ);
-        std::cout << std::format("启动失败, code: {}", errc) << std::endl;
+    std::setlocale(LC_ALL, ".UTF-8");
+#if defined(_WIN32)
+    auto        args      = std::string();
+    auto        argvector = std::vector<const char *>();
+    const auto *argv      = wargv_convert(argc, wargv, args, argvector);
+#else
+    if (!check_add_environ_and_restart(argc, argv, "LD_LIBRARY_PATH", ".")) {
+        return 0;
     }
 #endif
+#if defined(TEST_LUANCH)
+    return luanch_main(TEST_LUANCH, argc, argv);
+#else
     return luanch_main(std::filesystem::path(argv[0]).stem().string().c_str(), argc, argv);
-}
-
-#include "luancher/main.cpp"
-
-#if !defined(_WIN32)
-bool check_environment_value(const char *name, std::string_view value)
-{
-    auto env = getenv(name);
-    if (env) {
-        auto strenv   = std::string(":").append(env).append(":");
-        auto strvalue = std::string(":").append(value).append(":");
-        return strenv.find(strvalue) != std::string::npos;
-    }
-    return false;
-}
-
-bool add_environment_value(const char *name, std::string_view value)
-{
-    auto env = getenv(name);
-    if (env) {
-        return setenv(name, std::string(env).append(":").append(value).c_str(), 1) == 0;
-    }
-    return setenv(name, value.data(), 1) == 0;
-}
 #endif
+}
