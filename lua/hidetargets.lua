@@ -22,7 +22,8 @@ target("export")
                 if path.extension(filepath) == ".a" or path.extension(filepath) == ".lib" then
                 else
                     print("  " .. filepath .. " -> " .. path.translate(target:targetdir()))
-                    os.cp(filepath, target:targetdir() .. "/")
+                    os.tryrm(path.join(path.translate(target:targetdir()), path.filename(filepath)))
+                    os.cp(filepath, target:targetdir() .. "/", {symlink = true})
                 end
             end
         end
