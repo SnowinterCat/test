@@ -34,23 +34,23 @@ xmake f -p windows -a x64 -m releasedbg -k shared --runtimes=MD --3rd_kind=share
 ```
 #### For windows with clang-cl
 ```
-xmake f -p windows -a x64 -m releasedbg -k shared --runtimes=MD --toolchain=clang-cl --3rd_kind=shared -cv
+xmake f -p windows -a x64 -m releasedbg -k shared --runtimes=MD --3rd_kind=shared --toolchain=clang-cl -cv
 ```
 #### For windows with mingw
 ```
-xmake f -p mingw -a x86_64 -m releasedbg -k shared --runtimes=stdc++_shared --3rd_kind=shared --mingw=/PathToMingw -cv
+xmake f -p mingw -a x86_64 -m releasedbg -k shared --runtimes=stdc++_shared --3rd_kind=shared --mingw=/path_of_mingw -cv
 ```
 #### For linux with gcc
 ```
-xmake f -a x86_64 -m releasedbg -k shared --runtimes=stdc++_shared --3rd_kind=shared -cv
+xmake f -p linux -a x86_64 -m releasedbg -k shared --runtimes=stdc++_shared --3rd_kind=shared -cv
 ```
 #### For linux with gcc-13
 ```
-xmake f -a x86_64 -m releasedbg -k shared --runtimes=stdc++_shared --toolchain=gcc-13 --3rd_kind=shared -cv
+xmake f -p linux -a x86_64 -m releasedbg -k shared --runtimes=stdc++_shared --3rd_kind=shared --toolchain=gcc-13 -cv
 ```
 #### For linux with llvm
 ```
-xmake f -a x86_64 -m releasedbg -k shared --runtimes=stdc++_shared --toolchain=llvm --3rd_kind=shared -cv
+xmake f -p linux -a x86_64 -m releasedbg -k shared --runtimes=stdc++_shared --3rd_kind=shared --toolchain=llvm -cv
 ```
 
 ### compile

@@ -34,23 +34,23 @@ xmake f -p windows -a x64 -m releasedbg -k shared --runtimes=MD --3rd_kind=share
 ```
 #### Windows 上使用 clang-cl
 ```
-xmake f -p windows -a x64 -m releasedbg -k shared --runtimes=MD --toolchain=clang-cl --3rd_kind=shared -cv
+xmake f -p windows -a x64 -m releasedbg -k shared --runtimes=MD --3rd_kind=shared --toolchain=clang-cl -cv
 ```
 #### Windows 上使用 mingw
 ```
-xmake f -p mingw -a x86_64 -m releasedbg -k shared --runtimes=stdc++_shared --3rd_kind=shared -cv
+xmake f -p mingw -a x86_64 -m releasedbg -k shared --runtimes=stdc++_shared --3rd_kind=shared --mingw=/path_of_mingw -cv
 ```
 #### Linux 上使用 gcc
 ```
-xmake f -a x86_64 -m releasedbg -k shared --runtimes=stdc++_shared --3rd_kind=shared -cv
+xmake f -p linux -a x86_64 -m releasedbg -k shared --runtimes=stdc++_shared --3rd_kind=shared -cv
 ```
 #### Linux 上使用 gcc-13
 ```
-xmake f -a x86_64 -m releasedbg -k shared --runtimes=stdc++_shared --toolchain=gcc-13 --3rd_kind=shared -cv
+xmake f -p linux -a x86_64 -m releasedbg -k shared --runtimes=stdc++_shared --3rd_kind=shared --toolchain=gcc-13 -cv
 ```
 #### Linux 上使用 llvm
 ```
-xmake f -a x86_64 -m releasedbg -k shared --runtimes=stdc++_shared --toolchain=llvm --3rd_kind=shared -cv
+xmake f -p linux -a x86_64 -m releasedbg -k shared --runtimes=stdc++_shared --3rd_kind=shared --toolchain=llvm -cv
 ```
 
 ### 编译
