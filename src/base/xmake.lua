@@ -7,6 +7,8 @@ target("base")
     -- add_files("src/**.cpp")
 
     set_configdir("include/test")
-    set_configvar("USE_LUANCHER", is_config("use_luancher", true) and "true" or "false", {quote = false})
+    if has_config("luanch") then
+        set_configvar("TEST_LUANCH", get_config("luanch"))
+    end
     add_configfiles("config.h.in", {public = true})
 target_end()

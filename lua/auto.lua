@@ -30,7 +30,7 @@ function autofunc.library_autodefine(target)
 end
 
 function autofunc.binary_autoluanch(target)
-    if is_config("use_luancher", false) then
+    if is_config("luanch", false) then
         return
     end
     local proj_luancher = project.target("luancher")

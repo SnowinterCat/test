@@ -13,8 +13,9 @@
 #define TEST_PLAT "${PLAT}"
 #define TEST_ARCH "${ARCH}"
 #define TEST_MODE "${MODE}"
-#define TEST_DEBUG "${DEBUG}"
+#define TEST_DEBUG ${DEBUG}
 #define TEST_OS "${OS}"
-#define TEST_USE_LUANCHER ${USE_LUANCHER}
+
+${define TEST_LUANCH}
 
 #endif
