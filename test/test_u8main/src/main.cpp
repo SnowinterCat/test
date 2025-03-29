@@ -1,4 +1,5 @@
-#include "main.hpp"
+#include <test/config.h>
+#include "luancher/u8main.hpp"
 
 #include <spdlog/spdlog.h>
 
