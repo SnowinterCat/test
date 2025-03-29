@@ -5,6 +5,25 @@
 ## How to build?
 Test is built using xmake, for a related xmake tutorial check out [xmake-io](https://xmake.io/).
 
+### before build
+
+Some of the dependencies of this project are system libraries (e.g. libx11-dev) or third-party libraries that you need to install by yourself (e.g. vulkansdk, pkg-config). You need to install them before configuring with xmake.
+
+Of course, if some of the 3rd-party libraries that can be installed from xmake witch you also want to use the ones from system, you can also use the xmake configuration after installing them.
+
+But the following must be installed by yourself, here is an example for ubuntu 24.04:
+```
+wget -qO - https://packages.lunarg.com/lunarg-signing-key-pub.asc | sudo apt-key add -
+sudo wget -qO /etc/apt/sources.list.d/lunarg-vulkan-1.3.296-noble.list https://packages.lunarg.com/vulkan/1.3.296/lunarg-vulkan-1.3.296-noble.list
+sudo apt update
+
+sudo apt install libx11-dev libwayland-dev libxext-dev pkg-config vulkan-sdk
+```
+For Windows it is much easier, just go to the following website, download and install vulkansdk:
+```
+https://vulkan.lunarg.com/sdk/home
+```
+
 ### configure
 
 Before building, you need to configure the project.
