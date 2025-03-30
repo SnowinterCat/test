@@ -9,23 +9,17 @@
 namespace sdl3
 {
     struct Quiter {
-        void operator()([[maybe_unused]] void *p) { SDL_Quit(); }
+        void operator()(void *p) { p ? SDL_Quit() : void(); }
     };
 
     struct WindowDeleter {
-        void operator()(SDL_Window *window)
-        {
-            if (window) {
-                SDL_DestroyWindow(window);
-            }
-        }
+        void operator()(SDL_Window *p) { p ? SDL_DestroyWindow(p) : void(); }
     };
 } // namespace sdl3
 
 int u8main([[maybe_unused]] int argc, [[maybe_unused]] const char *const *argv)
 {
-    auto sdlIniter =
-        std::unique_ptr<void, sdl3::Quiter>((void *)SDL_Init(SDL_INIT_VIDEO));
+    auto sdlIniter = std::unique_ptr<void, sdl3::Quiter>((void *)SDL_Init(SDL_INIT_VIDEO));
     if (!sdlIniter) {
         SPDLOG_INFO("SDL_Init error, info: {}", SDL_GetError());
         return 0;
