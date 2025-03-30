@@ -42,12 +42,13 @@ int u8main([[maybe_unused]] int argc, [[maybe_unused]] const char *const *argv)
     auto run   = true;
     while (run) {
         while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_EVENT_QUIT) {
+            switch (event.type) {
+            case SDL_EVENT_QUIT:
                 run = false;
                 break;
-            }
-            else {
+            default:
                 SPDLOG_INFO("Get Message: {}", event.type);
+                break;
             }
         }
         SPDLOG_INFO("Render");
