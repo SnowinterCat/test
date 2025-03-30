@@ -25,7 +25,7 @@ namespace sdl3
 int u8main([[maybe_unused]] int argc, [[maybe_unused]] const char *const *argv)
 {
     auto sdlIniter =
-        std::unique_ptr<void, sdl3::Quiter>((void *)SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO));
+        std::unique_ptr<void, sdl3::Quiter>((void *)SDL_Init(SDL_INIT_VIDEO));
     if (!sdlIniter) {
         SPDLOG_INFO("SDL_Init error, info: {}", SDL_GetError());
         return 0;
