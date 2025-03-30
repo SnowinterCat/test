@@ -94,7 +94,8 @@ int luanch_main(const char *baseName, int argc, const char *const *argv)
         std::cout << std::format("LoadLibraryW error, code: {}", GetLastError()) << std::endl;
         return GetLastError();
     }
-    u8Main = reinterpret_cast<U8MAIN>(GetProcAddress(lib.get(), "u8main")); // NOLINT
+    u8Main =
+        reinterpret_cast<U8MAIN>(reinterpret_cast<size_t>(GetProcAddress(lib.get(), "u8main")));
     if (u8Main == nullptr) {
         std::cout << std::format("GetProcAddress error, code: {}", GetLastError()) << std::endl;
         return GetLastError();
@@ -105,7 +106,7 @@ int luanch_main(const char *baseName, int argc, const char *const *argv)
         std::cout << std::format("dlopen error, info: {}", dlerror()) << std::endl;
         return -1;
     }
-    u8Main = reinterpret_cast<U8MAIN>(dlsym(lib.get(), "u8main")); // NOLINT
+    u8Main = reinterpret_cast<U8MAIN>(dlsym(lib.get(), "u8main"));
     if (u8Main == nullptr) {
         std::cout << std::format("dlsym error, info: {}", dlerror()) << std::endl;
         return -1;
