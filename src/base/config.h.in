@@ -3,6 +3,7 @@
 
 #include "os.h"
 #include "host.h"
+#include "target.h"
 #include "compiler.h"
 
 #define TEST_VERSION "${VERSION}"
@@ -17,5 +18,10 @@
 #define TEST_OS "${OS}"
 
 ${define TEST_LUANCH}
+
+#define TEST_BEGIN                                                                                 \
+    namespace test                                                                                 \
+    {
+#define TEST_END }
 
 #endif

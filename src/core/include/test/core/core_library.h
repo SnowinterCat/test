@@ -1,6 +1,6 @@
-
 #ifndef _TEST_CORE_LIBRARY_H_
 #define _TEST_CORE_LIBRARY_H_
+#include <test/config.h>
 
 #if defined(_WIN32) && defined(TEST_CORE_DLL)
     #if defined(TEST_CORE_EXPORTS)
@@ -17,10 +17,5 @@
         #define TEST_CORE_API
     #endif
 #endif
-
-#define TEST_BEGIN                                                                                 \
-    namespace test                                                                                 \
-    {
-#define TEST_END }
 
 #endif

@@ -1,5 +1,4 @@
 #pragma once
-
 #include "test/core/core_library.h"
 
 #include <string>
