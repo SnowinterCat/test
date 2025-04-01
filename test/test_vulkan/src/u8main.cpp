@@ -1,19 +1,82 @@
 #include <test/config.h>
 #include "luancher/u8main.hpp"
 
+#include <span>
+
 #include <spdlog/spdlog.h>
+
 #include <test/vulkan.hpp>
+#include <test/sdl3.hpp>
+
+struct Context {
+    int width  = 1280;
+    int height = 720;
+
+    vk::raii::Instance instance = vk::raii::Instance(vk::raii::Context(), VkInstance());
+} g_context;
+
+//
+
+auto SetupVulkan(std::span<const char *const> extensions) -> vk::raii::Instance;
+
+//
 
 int u8main([[maybe_unused]] int argc, [[maybe_unused]] const char *const *argv)
 {
-    SPDLOG_INFO("hello vulkan");
+    auto quiter = std::unique_ptr<void, test::sdl3::Quiter>(
+        (void *)SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMEPAD));
+    if (!quiter) {
+        SPDLOG_ERROR("SDL_Init error, info: {}", SDL_GetError());
+        return -1;
+    }
 
-    vk::raii::Context context;
+    auto window = std::unique_ptr<SDL_Window, test::sdl3::WindowDestroyer>(
+        SDL_CreateWindow("Test ImGui SDL3+Vulkan example", g_context.width, g_context.height,
+                         SDL_WINDOW_VULKAN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY));
+    if (!window) {
+        SPDLOG_ERROR("SDL_CreateWindow error, info: {}", SDL_GetError());
+        return -1;
+    }
 
-    context.enumerateInstanceVersion();
-    context.enumerateInstanceLayerProperties();
-    context.enumerateInstanceExtensionProperties();
-    context.createInstance();
+    auto instance = SetupVulkan([]() -> auto {
+        auto extenCnt   = uint32_t(0);
+        auto extensions = SDL_Vulkan_GetInstanceExtensions(&extenCnt);
+        return std::span(extensions, extenCnt);
+    }());
 
     return 0;
+}
+
+auto SetupVulkan(std::span<const char *const> extensions) -> vk::raii::Instance
+{
+    SPDLOG_INFO("cnt: {}", extensions.size());
+    for (uint32_t i = 0; i < extensions.size(); ++i) {
+        SPDLOG_INFO("extension {}: {}", i, extensions[i]);
+    }
+
+    vk::raii::Context context;
+    auto              version = context.enumerateInstanceVersion();
+    SPDLOG_INFO("instance version: {}.{}.{}", vk::apiVersionMajor(version),
+                vk::apiVersionMinor(version), vk::apiVersionPatch(version));
+
+    auto layerProperties     = context.enumerateInstanceLayerProperties();
+    auto extensionProperties = context.enumerateInstanceExtensionProperties();
+
+    for (const auto &layerProperty : layerProperties) {
+        auto specVersion = layerProperty.specVersion;
+        SPDLOG_INFO("name: {}, des: {}, specVersion: {}.{}.{}", layerProperty.layerName.data(),
+                    layerProperty.description.data(), vk::apiVersionMajor(specVersion),
+                    vk::apiVersionMinor(specVersion), vk::apiVersionPatch(specVersion));
+    }
+    SPDLOG_INFO("");
+    for (const auto &extensionProperty : extensionProperties) {
+        auto specVersion = extensionProperty.specVersion;
+        SPDLOG_INFO("name: {}, specVersion: {}.{}.{}", extensionProperty.extensionName.data(),
+                    vk::apiVersionMajor(specVersion), vk::apiVersionMinor(specVersion),
+                    vk::apiVersionPatch(specVersion));
+    }
+    // context.createInstance();
+
+    vk::InstanceCreateInfo info;
+    return context.createInstance(info);
 }

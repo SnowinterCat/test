@@ -18,6 +18,11 @@
     #endif
 #endif
 
+#define TEST_VULKAN_BEGIN                                                                          \
+    namespace vk                                                                                   \
+    {
+#define TEST_VULKAN_END }
+
 #define VULKAN_HPP_DISPATCH_LOADER_DYNAMIC true
 
 #endif
