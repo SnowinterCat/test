@@ -12,12 +12,15 @@ struct Context {
     int width  = 1280;
     int height = 720;
 
-    vk::raii::Instance instance = vk::raii::Instance(vk::raii::Context(), VkInstance());
+    vk::raii::Context                context;
+    vk::raii::Instance               instance  = nullptr;
+    vk::raii::DebugUtilsMessengerEXT messenger = nullptr;
+    vk::raii::SurfaceKHR             surface   = nullptr;
 } g_context;
 
 //
 
-auto SetupVulkan(std::span<const char *const> extensions) -> vk::raii::Instance;
+void SetupVulkan(std::span<const char *const> extensions);
 
 //
 
@@ -38,7 +41,7 @@ int u8main([[maybe_unused]] int argc, [[maybe_unused]] const char *const *argv)
         return -1;
     }
 
-    auto instance = SetupVulkan([]() -> auto {
+    SetupVulkan([]() -> auto {
         auto extenCnt   = uint32_t(0);
         auto extensions = SDL_Vulkan_GetInstanceExtensions(&extenCnt);
         return std::span(extensions, extenCnt);
@@ -47,15 +50,18 @@ int u8main([[maybe_unused]] int argc, [[maybe_unused]] const char *const *argv)
     return 0;
 }
 
-auto SetupVulkan(std::span<const char *const> extensions) -> vk::raii::Instance
+void SetupVulkan(std::span<const char *const> extensions)
 {
     SPDLOG_INFO("cnt: {}", extensions.size());
     for (uint32_t i = 0; i < extensions.size(); ++i) {
         SPDLOG_INFO("extension {}: {}", i, extensions[i]);
     }
 
-    vk::raii::Context context;
-    auto              version = context.enumerateInstanceVersion();
+    auto &context   = g_context.context;
+    auto &instance  = g_context.instance;
+    auto &messenger = g_context.messenger;
+
+    auto version = context.enumerateInstanceVersion();
     SPDLOG_INFO("instance version: {}.{}.{}", vk::apiVersionMajor(version),
                 vk::apiVersionMinor(version), vk::apiVersionPatch(version));
 
@@ -77,6 +83,13 @@ auto SetupVulkan(std::span<const char *const> extensions) -> vk::raii::Instance
     }
     // context.createInstance();
 
-    vk::InstanceCreateInfo info;
-    return context.createInstance(info);
+    auto appInfo = vk::ApplicationInfo("",
+                                       vk::makeApiVersion(TEST_VERSION_MAJOR, TEST_VERSION_MINOR,
+                                                          TEST_VERSION_ALTER, TEST_VERSION_BUILD),
+                                       "No Engine",
+                                       vk::makeApiVersion(TEST_VERSION_MAJOR, TEST_VERSION_MINOR,
+                                                          TEST_VERSION_ALTER, TEST_VERSION_BUILD),
+                                       vk::ApiVersion12);
+    auto info    = vk::InstanceCreateInfo({}, &appInfo);
+    instance     = context.createInstance(info);
 }
