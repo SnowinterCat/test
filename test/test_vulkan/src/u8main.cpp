@@ -81,15 +81,17 @@ void SetupVulkan(std::span<const char *const> extensions)
                     vk::apiVersionMajor(specVersion), vk::apiVersionMinor(specVersion),
                     vk::apiVersionPatch(specVersion));
     }
-    // context.createInstance();
 
-    auto appInfo = vk::ApplicationInfo("",
-                                       vk::makeApiVersion(TEST_VERSION_MAJOR, TEST_VERSION_MINOR,
-                                                          TEST_VERSION_ALTER, TEST_VERSION_BUILD),
-                                       "No Engine",
-                                       vk::makeApiVersion(TEST_VERSION_MAJOR, TEST_VERSION_MINOR,
-                                                          TEST_VERSION_ALTER, TEST_VERSION_BUILD),
-                                       vk::ApiVersion12);
-    auto info    = vk::InstanceCreateInfo({}, &appInfo);
-    instance     = context.createInstance(info);
+    auto appInfo           = vk::ApplicationInfo("",
+                                                 vk::makeApiVersion(TEST_VERSION_MAJOR, TEST_VERSION_MINOR,
+                                                                    TEST_VERSION_ALTER, TEST_VERSION_BUILD),
+                                                 "No Engine",
+                                                 vk::makeApiVersion(TEST_VERSION_MAJOR, TEST_VERSION_MINOR,
+                                                                    TEST_VERSION_ALTER, TEST_VERSION_BUILD),
+                                                 vk::ApiVersion12);
+    auto enabledLayers     = std::vector<const char *>();
+    auto enabledExtensions = std::vector<const char *>();
+
+    auto info = vk::InstanceCreateInfo({}, &appInfo, enabledLayers, enabledExtensions);
+    instance  = context.createInstance(info).value();
 }

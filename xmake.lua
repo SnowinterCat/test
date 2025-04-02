@@ -4,7 +4,7 @@ set_version("0.0.1", {build = "$(buildversion)"})
 
 -- 全局设置
 set_warnings("allextra")
-set_languages("cxx20", "c17")
+set_languages("cxx23", "c23")
 set_exceptions("cxx")
 set_encodings("utf-8")
 
