@@ -20,7 +20,7 @@ struct Context {
 
 //
 
-#define VULKAN_VALIDATION_ENABLE true
+#define TEST_VULKAN_VALIDATION_ENABLE true
 
 void SetupVulkan(std::span<const char *const> extensions);
 
@@ -88,68 +88,57 @@ void SetupVulkan(std::span<const char *const> extensions)
     auto &context   = g_context.context;
     auto &instance  = g_context.instance;
     auto &messenger = g_context.messenger;
+    (void)messenger;
 
-    auto version             = context.enumerateInstanceVersion();
-    auto layerProperties     = context.enumerateInstanceLayerProperties();
-    auto extensionProperties = context.enumerateInstanceExtensionProperties();
+    // Create Vulkan Instance and Debug Messenger
+    {
+        auto layerProperties     = context.enumerateInstanceLayerProperties();
+        auto extensionProperties = context.enumerateInstanceExtensionProperties();
+        auto enabledLayers       = std::vector<const char *>();
+        auto enabledExtensions   = std::vector<const char *>(extensions.begin(), extensions.end());
 
-    SPDLOG_INFO("instance version: {}.{}.{}", vk::apiVersionMajor(version),
-                vk::apiVersionMinor(version), vk::apiVersionPatch(version));
-    for (const auto &layerProperty : layerProperties) {
-        auto specVersion = layerProperty.specVersion;
-        SPDLOG_INFO("name: {}, des: {}, specVersion: {}.{}.{}", layerProperty.layerName.data(),
-                    layerProperty.description.data(), vk::apiVersionMajor(specVersion),
-                    vk::apiVersionMinor(specVersion), vk::apiVersionPatch(specVersion));
-    }
-    SPDLOG_INFO("");
-    for (const auto &extensionProperty : extensionProperties) {
-        auto specVersion = extensionProperty.specVersion;
-        SPDLOG_INFO("name: {}, specVersion: {}.{}.{}", extensionProperty.extensionName.data(),
-                    vk::apiVersionMajor(specVersion), vk::apiVersionMinor(specVersion),
-                    vk::apiVersionPatch(specVersion));
-    }
+        auto appInfo =
+            vk::ApplicationInfo("",
+                                vk::makeApiVersion(TEST_VERSION_MAJOR, TEST_VERSION_MINOR,
+                                                   TEST_VERSION_ALTER, TEST_VERSION_BUILD),
+                                "No Engine",
+                                vk::makeApiVersion(TEST_VERSION_MAJOR, TEST_VERSION_MINOR,
+                                                   TEST_VERSION_ALTER, TEST_VERSION_BUILD),
+                                vk::ApiVersion12);
 
-    auto appInfo           = vk::ApplicationInfo("",
-                                                 vk::makeApiVersion(TEST_VERSION_MAJOR, TEST_VERSION_MINOR,
-                                                                    TEST_VERSION_ALTER, TEST_VERSION_BUILD),
-                                                 "No Engine",
-                                                 vk::makeApiVersion(TEST_VERSION_MAJOR, TEST_VERSION_MINOR,
-                                                                    TEST_VERSION_ALTER, TEST_VERSION_BUILD),
-                                                 vk::ApiVersion12);
-    auto enabledLayers     = std::vector<const char *>();
-    auto enabledExtensions = std::vector<const char *>(extensions.begin(), extensions.end());
+#if defined(TEST_VULKAN_VALIDATION_ENABLE) && TEST_VULKAN_VALIDATION_ENABLE
+        if (IsLayerAvailable(layerProperties, "VK_LAYER_KHRONOS_validation")) {
+            enabledLayers.push_back("VK_LAYER_KHRONOS_validation");
+        }
+        if (IsLayerAvailable(layerProperties, "VK_LAYER_LUNARG_monitor")) {
+            enabledLayers.push_back("VK_LAYER_LUNARG_monitor");
+        }
+        if (IsExtensionAvailable(extensionProperties, VK_EXT_DEBUG_UTILS_EXTENSION_NAME)) {
+            enabledExtensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+        }
 
-    auto vdEnabled = false;
-#if defined(VULKAN_VALIDATION_ENABLE) && VULKAN_VALIDATION_ENABLE
-    vdEnabled = true;
-    if (IsLayerAvailable(layerProperties, "VK_LAYER_KHRONOS_validation")) {
-        enabledLayers.push_back("VK_LAYER_KHRONOS_validation");
-    }
-    if (IsLayerAvailable(layerProperties, "VK_LAYER_LUNARG_monitor")) {
-        enabledLayers.push_back("VK_LAYER_LUNARG_monitor");
-    }
-    if (IsExtensionAvailable(extensionProperties, VK_EXT_DEBUG_UTILS_EXTENSION_NAME)) {
-        enabledExtensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
-    }
-
-    auto messengerInfo = vk::DebugUtilsMessengerCreateInfoEXT(
-        {},
-        vk::DebugUtilsMessageSeverityFlagBitsEXT::eInfo |
-            vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning |
-            vk::DebugUtilsMessageSeverityFlagBitsEXT::eError,
-        vk::DebugUtilsMessageTypeFlagBitsEXT::eGeneral |
-            vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance |
-            vk::DebugUtilsMessageTypeFlagBitsEXT::eValidation,
-        &DebugMessengerCallback, nullptr);
-    auto vdFeatureEnable = {vk::ValidationFeatureEnableEXT::eDebugPrintf};
-    auto vdFeatures      = vk::ValidationFeaturesEXT(vdFeatureEnable, {}, &messengerInfo);
+        auto messengerInfo = vk::DebugUtilsMessengerCreateInfoEXT(
+            {},
+            vk::DebugUtilsMessageSeverityFlagBitsEXT::eInfo |
+                vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning |
+                vk::DebugUtilsMessageSeverityFlagBitsEXT::eError,
+            vk::DebugUtilsMessageTypeFlagBitsEXT::eGeneral |
+                vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance |
+                vk::DebugUtilsMessageTypeFlagBitsEXT::eValidation,
+            &DebugMessengerCallback, nullptr);
+        auto vdFeatureEnable = {vk::ValidationFeatureEnableEXT::eDebugPrintf};
+        auto vdFeatures      = vk::ValidationFeaturesEXT(vdFeatureEnable, {}, &messengerInfo);
+        auto instanceInfo =
+            vk::InstanceCreateInfo({}, &appInfo, enabledLayers, enabledExtensions, &vdFeatures);
+#else
+        auto instanceInfo = vk::InstanceCreateInfo({}, &appInfo, enabledLayers, enabledExtensions);
 #endif
 
-    auto instanceInfo = vk::InstanceCreateInfo({}, &appInfo, enabledLayers, enabledExtensions,
-                                               vdEnabled ? &vdFeatures : nullptr);
-
-    instance  = context.createInstance(instanceInfo).value();
-    messenger = instance.createDebugUtilsMessengerEXT(messengerInfo).value();
+        instance = context.createInstance(instanceInfo).value();
+#if defined(TEST_VULKAN_VALIDATION_ENABLE) && TEST_VULKAN_VALIDATION_ENABLE
+        messenger = instance.createDebugUtilsMessengerEXT(messengerInfo).value();
+#endif
+    }
 }
 
 bool IsLayerAvailable(const std::vector<vk::LayerProperties> &properties, const char *layer)
@@ -193,7 +182,7 @@ VKAPI_ATTR VkBool32 VKAPI_CALL DebugMessengerCallback(
     }
 
     auto tmp = fmt::format(
-        "\n{}: ( {} ):\n\tmessageIDName   = <{}>\n\tmessageIdNumber = {}\n\tmessage         = <{}>",
+        "\n{}: {}:\n\tmessageIDName   = <{}>\n\tmessageIdNumber = {}\n\tmessage         = <{}>",
         vk::to_string(static_cast<vk::DebugUtilsMessageSeverityFlagBitsEXT>(messageSeverity)),
         vk::to_string(static_cast<vk::DebugUtilsMessageTypeFlagsEXT>(messageTypes)),
         pCallbackData->pMessageIdName, pCallbackData->messageIdNumber, pCallbackData->pMessage);

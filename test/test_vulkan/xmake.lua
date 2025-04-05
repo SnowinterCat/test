@@ -3,7 +3,7 @@ target("test_vulkan")
     set_targetdir("$(testdir)")
 
     add_deps("luancher", "vulkan", "sdl3")
-    add_packages("spdlog")
+    add_packages("spdlog", "imgui")
 
     -- add_includedirs("include", {public = true})
     -- add_headerfiles("include/(**)")
