@@ -2,7 +2,7 @@ target("luancher")
     set_kind("binary")
     set_targetdir("$(bindir)")
 
-    add_deps("base")
+    add_deps("config")
     -- add_packages("spdlog")
 
     add_includedirs("include", {public = true})

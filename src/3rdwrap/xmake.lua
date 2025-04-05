@@ -1,9 +1,9 @@
-target("vulkan")
+target("3rdwrap")
     set_kind("$(kind)")
     set_targetdir("$(libdir)")
 
-    add_deps("base")
-    add_packages("spdlog", "vulkansdk", {public = true})
+    add_deps("config")
+    add_packages("spdlog", "vulkansdk", "libsdl3", {public = true})
 
     add_includedirs("include", {public = true})
     add_headerfiles("include/(**)")

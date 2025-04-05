@@ -1,12 +1,12 @@
-#include "test/sdl3/deleter.hpp"
+#include "test/3rdwrap/libsdl3/deleter.hpp"
 
 TEST_BEGIN
-TEST_SDL3_BEGIN
+TEST_3RDWRAP_BEGIN
 
-void TEST_SDL3_API unused()
+void TEST_3RDWRAP_API unused()
 {
     ;
 }
 
-TEST_SDL3_END
+TEST_3RDWRAP_END
 TEST_END

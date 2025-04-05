@@ -1,4 +1,4 @@
 #pragma once
-#include <test/vulkan/vulkan_library.h>
+#include <test/3rdwrap/3rdwrap_library.h>
 
-#include <test/vulkan/deleter.hpp>
+#include <test/3rdwrap/vulkan/deleter.hpp>

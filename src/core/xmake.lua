@@ -2,7 +2,7 @@ target("core")
     set_kind("$(kind)")
     set_targetdir("$(libdir)")
 
-    add_deps("base")
+    add_deps("config")
     -- add_packages("spdlog")
 
     add_includedirs("include", {public = true})
