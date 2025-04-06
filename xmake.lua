@@ -36,10 +36,12 @@ add_requires(
 )
 -- normal libraries
 add_requires("vulkansdk")
+add_requires("vulkan-memory-allocator-hpp", {version = "3.1.0"})
 add_requires("libsdl3", {version = "3.x.x", configs = {shared = is_config("3rd_kind", "shared"), x11 = true, wayland = true}})
 add_requires("imgui", {version = "1.x.x", configs = {shared = is_config("3rd_kind", "shared")}})
 add_requires("spdlog", {version = "1.x.x", configs = {shared = is_config("3rd_kind", "shared"), header_only = false, fmt_external = true, wchar = true, wchar_console = true}})
 -- normal libraries' dependencies configurations
+add_requireconfs("**.vulkan-memory-allocator", {override = true, version = "3.1.0"})
 add_requireconfs("**.libxext", {system = true})     -- from libsdl3
 add_requireconfs("**.libx11", {system = true})      -- from libsdl3
 add_requireconfs("**.wayland", {system = true})     -- from libsdl3
