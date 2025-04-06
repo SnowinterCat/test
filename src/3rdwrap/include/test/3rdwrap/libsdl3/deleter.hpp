@@ -1,5 +1,5 @@
 #pragma once
-#include <test/3rdwrap/3rdwrap_library.h>
+#include <test/3rdwrap/libsdl3/libsdl3_library.h>
 
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_vulkan.h>
