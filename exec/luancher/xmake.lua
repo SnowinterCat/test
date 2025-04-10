@@ -11,7 +11,7 @@ target("luancher")
     add_files("src/**.cpp", {public = true})
 
     if has_config("luanch") then
-        add_runenvs("LD_LIBRARY_PATH", ".")
+        add_runenvs("LD_LIBRARY_PATH", "$(libdir)", ".")
     end
     on_load(function (target) 
         import("lua.auto", {rootdir = os.projectdir()})
