@@ -13,6 +13,16 @@ auto GetVkInstanceExtensions() -> std::span<const char *const>
     return std::span(extensions, extenCnt);
 }
 
+auto TEST_3RDWRAP_API GetVkSurfaceOfWindow(SDL_Window *window, VkInstance instance,
+                                           const VkAllocationCallbacks *allocator) -> VkSurfaceKHR
+{
+    VkSurfaceKHR surface;
+    if (!SDL_Vulkan_CreateSurface(window, instance, allocator, &surface)) {
+        return nullptr;
+    }
+    return surface;
+}
+
 TEST_LIBSDL3_END
 TEST_3RDWRAP_END
 TEST_END
