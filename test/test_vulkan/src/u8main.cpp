@@ -14,6 +14,7 @@ struct Context {
     vk::raii::Context        context;
     test::wrap::vk::Instance instance;
     test::wrap::vk::Device   device;
+    vk::raii::SurfaceKHR     surface = nullptr;
 } g_context;
 
 //
@@ -39,10 +40,20 @@ int u8main([[maybe_unused]] int argc, [[maybe_unused]] const char *const *argv)
         return -1;
     }
 
+    // create instance, device, descriptor pool
     if (auto res = SetupVulkan(test::wrap::sdl3::GetVkInstanceExtensions()); !res) {
         SPDLOG_ERROR("SetupVulkan error, code: {}, info: {}", static_cast<int>(res.error()),
                      vk::to_string(res.error()));
         return static_cast<int>(res.error());
+    }
+
+    // create surface
+    if (g_context.surface = vk::raii::SurfaceKHR(
+            g_context.instance.instance,
+            test::wrap::sdl3::GetVkSurfaceOfWindow(window.get(), *g_context.instance.instance));
+        *g_context.surface == nullptr) {
+        SPDLOG_ERROR("GetVkSurfaceOfWindow error, info: {}", SDL_GetError());
+        return static_cast<int>(vk::Result::eErrorSurfaceLostKHR);
     }
 
     auto event = SDL_Event();
