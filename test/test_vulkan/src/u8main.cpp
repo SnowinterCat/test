@@ -18,7 +18,7 @@ struct Context {
 
 //
 
-auto SetupVulkan(std::span<const char *const> extensions) -> vk::Result;
+auto SetupVulkan(std::span<const char *const> extensions) -> std::expected<void, vk::Result>;
 
 //
 
@@ -39,12 +39,10 @@ int u8main([[maybe_unused]] int argc, [[maybe_unused]] const char *const *argv)
         return -1;
     }
 
-    auto vkRes = vk::Result();
-    if (vkRes = SetupVulkan(test::wrap::sdl3::GetVkInstanceExtensions());
-        vkRes != vk::Result::eSuccess) {
-        SPDLOG_ERROR("SetupVulkan error, code: {}, info: {}", static_cast<int>(vkRes),
-                     vk::to_string(vkRes));
-        return static_cast<int>(vkRes);
+    if (auto res = SetupVulkan(test::wrap::sdl3::GetVkInstanceExtensions()); !res) {
+        SPDLOG_ERROR("SetupVulkan error, code: {}, info: {}", static_cast<int>(res.error()),
+                     vk::to_string(res.error()));
+        return static_cast<int>(res.error());
     }
 
     auto event = SDL_Event();
@@ -72,7 +70,7 @@ int u8main([[maybe_unused]] int argc, [[maybe_unused]] const char *const *argv)
     return 0;
 }
 
-auto SetupVulkan(std::span<const char *const> extensions) -> vk::Result
+auto SetupVulkan(std::span<const char *const> extensions) -> std::expected<void, vk::Result>
 {
     auto &context  = g_context.context;
     auto &instance = g_context.instance;
@@ -80,16 +78,18 @@ auto SetupVulkan(std::span<const char *const> extensions) -> vk::Result
 
     // Create Vulkan Instance and Debug Messenger
     if (auto res = test::wrap::vk::CreateDefaultVkInstance(context, extensions, true); !res)
-        return res.error();
+        return std::unexpected(res.error());
     else {
         instance = std::move(res.value());
     }
+
+    // Vulkan Physical Device and Logical Device
     if (auto res = test::wrap::vk::CreateDefaultDevice(instance, {}); !res)
-        return res.error();
+        return std::unexpected(res.error());
     else {
         device = std::move(res.value());
     }
 
-    // Physical Device and Logical Device
-    return vk::Result();
+    // Vulkan Descriptor Pool
+    return {};
 }
