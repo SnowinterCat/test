@@ -1,5 +1,8 @@
 #include "test/3rdwrap/vulkan/functions.hpp"
 
+#include <algorithm>
+#include <limits>
+
 #include <spdlog/spdlog.h>
 
 TEST_BEGIN
@@ -54,21 +57,137 @@ auto TEST_3RDWRAP_API CreateDefaultVkInstance(const ::vk::raii::Context   &conte
     }
     auto instanceInfo = ::vk::InstanceCreateInfo({}, &appInfo, enabledLayers, enabledExtensions,
                                                  isDebug ? &vdFeatures : nullptr);
-    if (auto res = context.createInstance(instanceInfo); res)
-        instance.instance = std::move(res.value());
-    else {
+    if (auto res = context.createInstance(instanceInfo); !res)
         return std::unexpected(res.error());
+    else {
+        instance.instance = std::move(res.value());
     }
 
     // create ::vk::raii::DebugUtilsMessengerEXT
     if (isDebug) {
-        if (auto res = instance.instance.createDebugUtilsMessengerEXT(messengerInfo); res)
-            instance.messenger = std::move(res.value());
-        else {
+        if (auto res = instance.instance.createDebugUtilsMessengerEXT(messengerInfo); !res)
             return std::unexpected(res.error());
+        else {
+            instance.messenger = std::move(res.value());
         }
     }
     return instance;
+}
+
+auto TEST_3RDWRAP_API CreateDefaultDevice(const Instance                     &instance,
+                                          const ::vk::PhysicalDeviceFeatures &features)
+    -> std::expected<Device, ::vk::Result>
+{
+    auto  device = Device();
+    auto &inst   = instance.instance;
+
+    auto &physicalDevGroup = device.physicalDeviceGroup;
+    auto &physicalDev      = device.physicalDevice;
+    auto &dev              = device.device;
+
+    auto deviceGroups = inst.enumeratePhysicalDeviceGroups();
+    if (deviceGroups.empty()) {
+        return std::unexpected(::vk::Result::eErrorDeviceLost);
+    }
+
+    // physical device
+    physicalDevGroup = SelectPhysicalDeviceGroup(deviceGroups, inst);
+    physicalDev      = ::vk::raii::PhysicalDevice(inst, physicalDevGroup.physicalDevices[0]);
+
+    // device queue
+    auto queueProperties      = physicalDev.getQueueFamilyProperties();
+    device.graphicsQueueIndex = SelectDeviceQueueFamilyIndex(
+        queueProperties, ::vk::QueueFlagBits::eGraphics, ::vk::QueueFlags());
+    device.transferQueueIndex = SelectDeviceQueueFamilyIndex(
+        queueProperties, ::vk::QueueFlagBits::eTransfer, ::vk::QueueFlagBits::eGraphics);
+    device.computeQueueIndex = SelectDeviceQueueFamilyIndex(
+        queueProperties, ::vk::QueueFlagBits::eCompute, ::vk::QueueFlagBits::eGraphics);
+    if (device.graphicsQueueIndex == std::numeric_limits<size_t>::max()) {
+        return std::unexpected(::vk::Result::eErrorDeviceLost);
+    }
+    if (device.transferQueueIndex == std::numeric_limits<size_t>::max()) {
+        device.transferQueueIndex = device.graphicsQueueIndex;
+    }
+    if (device.computeQueueIndex == std::numeric_limits<size_t>::max()) {
+        device.computeQueueIndex = device.graphicsQueueIndex;
+    }
+    // device.graphicsQueueIndex = device.transferQueueIndex;
+    // device.computeQueueIndex  = device.transferQueueIndex;
+    SelectDeviceQueueIndex(
+        queueProperties,
+        std::span<uint64_t *const>(
+            {&device.graphicsQueueIndex, &device.transferQueueIndex, &device.computeQueueIndex}));
+    uint64_t queueIndex[]      = {device.graphicsQueueIndex, device.transferQueueIndex,
+                                  device.computeQueueIndex};
+    float    queuePriorities[] = {1.0, 0.5, 0.5};
+    auto     queueInfos =
+        BuildDeviceQueueCreateInfo({}, std::span(queueIndex), std::span(queuePriorities));
+    // for (const auto &queueProperty : queueProperties) {
+    //     SPDLOG_INFO("cnt: {}, flags: {}", queueProperty.queueCount,
+    //                 ::vk::to_string(queueProperty.queueFlags));
+    // }
+    // SPDLOG_INFO("graphics: {}, transfer: {}, compute: {}", queueIndex[0], queueIndex[1],
+    //             queueIndex[2]);
+    // for (const auto &queueInfo : queueInfos) {
+    //     auto tmp = fmt::format("index: {}, cnt: {}, priorities:", queueInfo.queueFamilyIndex,
+    //                            queueInfo.queueCount);
+    //     for (size_t i = 0; i < queueInfo.queueCount; ++i) {
+    //         tmp = fmt::format("{} {}", tmp, queueInfo.pQueuePriorities[i]);
+    //     }
+    //     SPDLOG_INFO(tmp);
+    // }
+
+    // layers and extensions
+    // Device layers is deprecated!!!!!!!!!!
+    // See: https://github.com/KhronosGroup/Vulkan-Loader/issues/1086
+    auto layerProperties = physicalDev.enumerateDeviceLayerProperties();
+    auto extenProperties = physicalDev.enumerateDeviceExtensionProperties();
+    auto enabledLayers   = std::vector<const char *>();
+    auto enabledExtens   = std::vector<const char *>();
+    // for (const auto &layer : layerProperties) {
+    //     SPDLOG_INFO("name: {}, des: {}", layer.layerName.data(), layer.description.data());
+    // }
+    // SPDLOG_INFO("");
+    // for (const auto &exten : extenProperties) {
+    //     SPDLOG_INFO("name: {}", exten.extensionName.data());
+    // }
+    // SPDLOG_INFO("");
+    if (IsExtensionAvailable(extenProperties, VK_KHR_SWAPCHAIN_EXTENSION_NAME)) {
+        enabledExtens.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
+    }
+    // for (const auto &layer : enabledLayers) {
+    //     SPDLOG_INFO("name: {}", layer);
+    // }
+    // SPDLOG_INFO("");
+    // for (const auto &exten : enabledExtens) {
+    //     SPDLOG_INFO("name: {}", exten);
+    // }
+    // SPDLOG_INFO("");
+
+    // features
+
+    // VkDeviceGroupDeviceCreateInfo
+    auto devGroupInfo = ::vk::DeviceGroupDeviceCreateInfo(physicalDevGroup.physicalDeviceCount,
+                                                          physicalDevGroup.physicalDevices);
+
+    // create
+    auto info = ::vk::DeviceCreateInfo({}, queueInfos, enabledLayers, enabledExtens, &features,
+                                       &devGroupInfo);
+    if (auto res = physicalDev.createDevice(info); !res)
+        return std::unexpected(res.error());
+    else {
+        dev = std::move(res.value());
+        device.graphicsQueue =
+            dev.getQueue(device.graphicsQueueIndex & 0xFFFFFFFF, device.graphicsQueueIndex >> 32)
+                .value();
+        device.transferQueue =
+            dev.getQueue(device.transferQueueIndex & 0xFFFFFFFF, device.transferQueueIndex >> 32)
+                .value();
+        device.computeQueue =
+            dev.getQueue(device.computeQueueIndex & 0xFFFFFFFF, device.computeQueueIndex >> 32)
+                .value();
+    }
+    return device;
 }
 
 //
@@ -88,6 +207,97 @@ bool IsExtensionAvailable(const std::vector<::vk::ExtensionProperties> &properti
         if (strcmp(p.extensionName, extension) == 0)
             return true;
     return false;
+}
+
+auto SelectPhysicalDeviceGroup(const std::vector<::vk::PhysicalDeviceGroupProperties> &properties,
+                               const ::vk::raii::Instance                             &instance)
+    -> ::vk::PhysicalDeviceGroupProperties
+{
+    if (properties.empty()) {
+        return ::vk::PhysicalDeviceGroupProperties();
+    }
+
+    for (const auto &groupProperty : properties) {
+        auto property = groupProperty.physicalDevices[0].getProperties(*instance.getDispatcher());
+        if (property.deviceType == ::vk::PhysicalDeviceType::eDiscreteGpu) {
+            return groupProperty;
+        }
+    }
+    for (const auto &groupProperty : properties) {
+        auto property = groupProperty.physicalDevices[0].getProperties(*instance.getDispatcher());
+        if (property.deviceType == ::vk::PhysicalDeviceType::eIntegratedGpu) {
+            return groupProperty;
+        }
+    }
+    for (const auto &groupProperty : properties) {
+        auto property = groupProperty.physicalDevices[0].getProperties(*instance.getDispatcher());
+        if (property.deviceType == ::vk::PhysicalDeviceType::eCpu) {
+            return groupProperty;
+        }
+    }
+    return properties[0];
+}
+
+auto SelectDeviceQueueFamilyIndex(const std::vector<::vk::QueueFamilyProperties> &properties,
+                                  ::vk::QueueFlags required, ::vk::QueueFlags refused) -> size_t
+{
+    for (size_t i = 0; i < properties.size(); ++i) {
+        if (properties[i].queueFlags & required && !(properties[i].queueFlags & refused))
+            return i;
+    }
+    return std::numeric_limits<size_t>::max();
+}
+
+void SelectDeviceQueueIndex(const std::vector<::vk::QueueFamilyProperties> &properties,
+                            std::span<uint64_t *const>                      queueIndices)
+{
+    auto cnt = std::vector<uint32_t>(properties.size());
+    for (size_t i = 0; i < properties.size(); ++i) {
+        cnt[i] = properties[i].queueCount;
+    }
+
+    for (size_t i = 0; i < queueIndices.size(); ++i) {
+        assert(queueIndices[i]);
+        uint64_t lowInt = *queueIndices[i] & 0xFFFFFFFF;
+        assert(lowInt < properties.size());
+        uint64_t highInt = properties[lowInt].queueCount - cnt[lowInt];
+        if (cnt[lowInt] > 1)
+            cnt[lowInt]--;
+        *queueIndices[i] = (highInt << 32) | lowInt;
+    }
+}
+
+auto BuildDeviceQueueCreateInfo(::vk::DeviceQueueCreateFlags deviceQueueCreateFlag,
+                                std::span<uint64_t> queueIndices, std::span<float> queuePriorities)
+    -> std::vector<::vk::DeviceQueueCreateInfo>
+{
+    assert(queueIndices.size() == queuePriorities.size());
+    auto vec = std::vector<std::pair<uint64_t, float>>(queueIndices.size());
+    for (size_t i = 0; i < queueIndices.size(); ++i) {
+        vec[i].first  = queueIndices[i] >> 32 | (queueIndices[i] & 0xFFFFFFFF) << 32;
+        vec[i].second = queuePriorities[i];
+    }
+    sort(vec.begin(), vec.end());
+    for (size_t i = 0; i < vec.size(); ++i) {
+        queueIndices[i]    = vec[i].first >> 32 | (vec[i].first & 0xFFFFFFFF) << 32;
+        queuePriorities[i] = vec[i].second;
+    }
+
+    auto   info = std::vector<::vk::DeviceQueueCreateInfo>();
+    size_t last = 0;
+    for (size_t i = 1; i < vec.size(); ++i) {
+        if ((queueIndices[i] & 0xFFFFFFFF) == (queueIndices[i - 1] & 0xFFFFFFFF))
+            continue;
+        info.push_back(::vk::DeviceQueueCreateInfo(
+            deviceQueueCreateFlag, queueIndices[i - 1] & 0xFFFFFFFF,
+            (queueIndices[i - 1] >> 32) - (queueIndices[last] >> 32) + 1, &queuePriorities[last]));
+        last = i;
+    }
+    info.push_back(::vk::DeviceQueueCreateInfo(
+        deviceQueueCreateFlag, queueIndices[queueIndices.size() - 1] & 0xFFFFFFFF,
+        (queueIndices[queueIndices.size() - 1] >> 32) - (queueIndices[last] >> 32) + 1,
+        &queuePriorities[last]));
+    return info;
 }
 
 //

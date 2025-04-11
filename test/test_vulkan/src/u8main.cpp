@@ -11,25 +11,14 @@ struct Context {
     int width  = 1280;
     int height = 720;
 
-    vk::PhysicalDeviceGroupProperties physicalDeviceGroup;
-
-    vk::raii::Context                context;
-    vk::raii::Instance               instance  = nullptr;
-    vk::raii::DebugUtilsMessengerEXT messenger = nullptr;
-    vk::raii::Device                 device    = nullptr;
-    vk::raii::SurfaceKHR             surface   = nullptr;
-
-    vk::raii::Queue graphicsQueue = nullptr;
-    vk::raii::Queue transferQueue = nullptr;
-    vk::raii::Queue computeQueue  = nullptr;
+    vk::raii::Context        context;
+    test::wrap::vk::Instance instance;
+    test::wrap::vk::Device   device;
 } g_context;
 
 //
 
 auto SetupVulkan(std::span<const char *const> extensions) -> vk::Result;
-
-static size_t SelectQueueFamilyIndex(const std::vector<vk::QueueFamilyProperties> &properties,
-                                     vk::QueueFlags requiredFlags, vk::QueueFlags refused);
 
 //
 
@@ -85,74 +74,22 @@ int u8main([[maybe_unused]] int argc, [[maybe_unused]] const char *const *argv)
 
 auto SetupVulkan(std::span<const char *const> extensions) -> vk::Result
 {
-    auto &physicalDeviceGroup = g_context.physicalDeviceGroup;
-
-    auto &context   = g_context.context;
-    auto &instance  = g_context.instance;
-    auto &messenger = g_context.messenger;
-    auto &device    = g_context.device;
-    (void)messenger;
+    auto &context  = g_context.context;
+    auto &instance = g_context.instance;
+    auto &device   = g_context.device;
 
     // Create Vulkan Instance and Debug Messenger
     if (auto res = test::wrap::vk::CreateDefaultVkInstance(context, extensions, true); !res)
         return res.error();
     else {
-        instance  = std::move(res->instance);
-        messenger = std::move(res->messenger);
+        instance = std::move(res.value());
+    }
+    if (auto res = test::wrap::vk::CreateDefaultDevice(instance, {}); !res)
+        return res.error();
+    else {
+        device = std::move(res.value());
     }
 
     // Physical Device and Logical Device
-    {
-        auto deviceGroups = instance.enumeratePhysicalDeviceGroups();
-        for (const auto &deviceGroup : deviceGroups) {
-            auto property = deviceGroup.physicalDevices[0].getProperties(*instance.getDispatcher());
-            if (property.deviceType == vk::PhysicalDeviceType::eDiscreteGpu) {
-                physicalDeviceGroup = deviceGroup;
-            }
-        }
-        auto physicalDevice =
-            vk::raii::PhysicalDevice(instance, physicalDeviceGroup.physicalDevices[0]);
-
-        //
-        auto     queueProperties = physicalDevice.getQueueFamilyProperties();
-        uint32_t graphicsQueueFamily =
-            SelectQueueFamilyIndex(queueProperties, vk::QueueFlagBits::eGraphics, vk::QueueFlags());
-        uint32_t transferQueueFamily = SelectQueueFamilyIndex(
-            queueProperties, vk::QueueFlagBits::eTransfer, vk::QueueFlagBits::eGraphics);
-        uint32_t computeQueueFamily =
-            SelectQueueFamilyIndex(queueProperties, vk::QueueFlagBits::eCompute, vk::QueueFlags());
-
-        for (const auto &queueProperty : queueProperties) {
-            SPDLOG_INFO(
-                "queue count: {}, flags: {}, minImageTransferGranularity: {}*{}*{}, timestamp: {}",
-                queueProperty.queueCount, vk::to_string(queueProperty.queueFlags),
-                queueProperty.minImageTransferGranularity.width,
-                queueProperty.minImageTransferGranularity.height,
-                queueProperty.minImageTransferGranularity.depth, queueProperty.timestampValidBits);
-        }
-        SPDLOG_INFO("graphics: {}, transfer: {}, compute: {}", graphicsQueueFamily,
-                    transferQueueFamily, computeQueueFamily);
-
-        auto deviceGroupInfo = vk::DeviceGroupDeviceCreateInfo(physicalDeviceGroup.physicalDevices);
-        auto deviceInfo      = vk::DeviceCreateInfo();
-
-        if (auto res = physicalDevice.createDevice(deviceInfo); res)
-            device = std::move(res.value());
-        else {
-            return res.error();
-        }
-
-        // device.getQueue(, );
-    }
     return vk::Result();
-}
-
-size_t SelectQueueFamilyIndex(const std::vector<vk::QueueFamilyProperties> &properties,
-                              vk::QueueFlags requiredFlags, vk::QueueFlags refused)
-{
-    for (size_t i = 0; i < properties.size(); ++i) {
-        if (properties[i].queueFlags & requiredFlags && !(properties[i].queueFlags & refused))
-            return i;
-    }
-    return -1;
 }

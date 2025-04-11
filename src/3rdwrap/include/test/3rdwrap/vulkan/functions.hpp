@@ -24,7 +24,8 @@ auto TEST_3RDWRAP_API CreateDefaultVkInstance(const ::vk::raii::Context   &conte
                                               std::span<const char *const> extensions, bool isDebug)
     -> std::expected<Instance, ::vk::Result>;
 
-auto TEST_3RDWRAP_API CreateDefaultDevice(const Instance &, const ::vk::PhysicalDeviceFeatures &)
+auto TEST_3RDWRAP_API CreateDefaultDevice(const Instance                     &instance,
+                                          const ::vk::PhysicalDeviceFeatures &features)
     -> std::expected<Device, ::vk::Result>;
 
 auto TEST_3RDWRAP_API CreateDefaultSwapchain(const Device &)
@@ -36,6 +37,21 @@ bool TEST_3RDWRAP_API IsLayerAvailable(const std::vector<::vk::LayerProperties> 
                                        const char                               *layer);
 bool TEST_3RDWRAP_API IsExtensionAvailable(const std::vector<::vk::ExtensionProperties> &properties,
                                            const char                                   *extension);
+
+auto TEST_3RDWRAP_API SelectPhysicalDeviceGroup(
+    const std::vector<::vk::PhysicalDeviceGroupProperties> &properties,
+    const ::vk::raii::Instance &instance) -> ::vk::PhysicalDeviceGroupProperties;
+auto TEST_3RDWRAP_API
+SelectDeviceQueueFamilyIndex(const std::vector<::vk::QueueFamilyProperties> &properties,
+                             ::vk::QueueFlags required, ::vk::QueueFlags refused) -> size_t;
+void TEST_3RDWRAP_API
+SelectDeviceQueueIndex(const std::vector<::vk::QueueFamilyProperties> &properties,
+                       std::span<uint64_t *const>                      queueIndices);
+
+auto TEST_3RDWRAP_API BuildDeviceQueueCreateInfo(::vk::DeviceQueueCreateFlags deviceQueueCreateFlag,
+                                                 std::span<uint64_t>          queueIndices,
+                                                 std::span<float>             queuePriorities)
+    -> std::vector<::vk::DeviceQueueCreateInfo>;
 
 //
 

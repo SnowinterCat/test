@@ -8,19 +8,20 @@ TEST_3RDWRAP_BEGIN
 TEST_VULKAN_BEGIN
 
 struct Instance {
-    ::vk::raii::Instance               instance;
-    ::vk::raii::DebugUtilsMessengerEXT messenger;
+    ::vk::raii::Instance               instance  = nullptr;
+    ::vk::raii::DebugUtilsMessengerEXT messenger = nullptr;
 };
 
 struct Device {
     ::vk::PhysicalDeviceGroupProperties physicalDeviceGroup;
-    ::vk::raii::Device                  device;
-    ::vk::raii::Queue                   graphicsQueue;
-    uint64_t                            graphicsQueueIndex;
-    ::vk::raii::Queue                   transferQueue;
-    uint64_t                            transferQueueIndex;
-    ::vk::raii::Queue                   computeQueue;
-    uint64_t                            computeQueueIndex;
+    ::vk::raii::PhysicalDevice          physicalDevice     = nullptr;
+    ::vk::raii::Device                  device             = nullptr;
+    ::vk::raii::Queue                   graphicsQueue      = nullptr;
+    uint64_t                            graphicsQueueIndex = 0;
+    ::vk::raii::Queue                   transferQueue      = nullptr;
+    uint64_t                            transferQueueIndex = 0;
+    ::vk::raii::Queue                   computeQueue       = nullptr;
+    uint64_t                            computeQueueIndex  = 0;
 };
 
 struct Swapchain {
