@@ -7,6 +7,7 @@ set_warnings("allextra")
 set_languages("cxx23", "c23")
 set_exceptions("cxx")
 set_encodings("utf-8")
+set_policy("package.cmake_generator.ninja", true)
 
 -- 添加编译选项
 add_rules("mode.release", "mode.debug", "mode.releasedbg", "mode.minsizerel")
@@ -42,6 +43,7 @@ add_requires("imgui", {version = "1.x.x", configs = {shared = is_config("3rd_kin
 add_requires("spdlog", {version = "1.x.x", configs = {shared = is_config("3rd_kind", "shared"), header_only = false, fmt_external = true, wchar = true, wchar_console = true}})
 -- normal libraries' dependencies configurations
 add_requireconfs("**.vulkan-memory-allocator", {override = true, version = "3.1.0"})
+add_requireconfs("**.vulkan-headers", {override = true, version = "1.3.296"})
 add_requireconfs("**.libxext", {system = true})     -- from libsdl3
 add_requireconfs("**.libx11", {system = true})      -- from libsdl3
 add_requireconfs("**.wayland", {system = true})     -- from libsdl3
