@@ -275,12 +275,12 @@ auto BuildDeviceQueueCreateInfo(::vk::DeviceQueueCreateFlags deviceQueueCreateFl
     auto vec = std::vector<std::pair<uint64_t, float>>(queueIndices.size());
     for (size_t i = 0; i < queueIndices.size(); ++i) {
         vec[i].first  = queueIndices[i] >> 32 | (queueIndices[i] & 0xFFFFFFFF) << 32;
-        vec[i].second = queuePriorities[i];
+        vec[i].second = -queuePriorities[i];
     }
     sort(vec.begin(), vec.end());
     for (size_t i = 0; i < vec.size(); ++i) {
         queueIndices[i]    = vec[i].first >> 32 | (vec[i].first & 0xFFFFFFFF) << 32;
-        queuePriorities[i] = vec[i].second;
+        queuePriorities[i] = -vec[i].second;
     }
 
     auto   info = std::vector<::vk::DeviceQueueCreateInfo>();
