@@ -35,9 +35,9 @@ add_requires(
     -- c++23
     "out_ptr"
 )
+add_requires("vulkan-memory-allocator-hpp", {version = "3.1.0"})
 -- normal libraries
 add_requires("vulkansdk")
-add_requires("vulkan-memory-allocator-hpp", {version = "3.1.0"})
 add_requires("libsdl3", {version = "3.x.x", configs = {shared = is_config("3rd_kind", "shared"), x11 = true, wayland = true}})
 add_requires("imgui", {version = "1.x.x", configs = {shared = is_config("3rd_kind", "shared")}})
 add_requires("spdlog", {version = "1.x.x", configs = {shared = is_config("3rd_kind", "shared"), header_only = false, fmt_external = true, wchar = true, wchar_console = true}})
