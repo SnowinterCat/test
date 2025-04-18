@@ -3,7 +3,7 @@ target("3rdwrap")
     set_targetdir("$(libdir)")
 
     add_deps("config")
-    add_packages("spdlog", "vulkansdk", "libsdl3", {public = true})
+    add_packages("spdlog", "vulkansdk", "libsdl3", "vulkan-memory-allocator-hpp", {public = true})
 
     add_includedirs("include", {public = true})
     add_headerfiles("include/(**)")
