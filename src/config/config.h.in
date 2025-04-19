@@ -6,7 +6,10 @@
 #include "target.h"
 #include "compiler.h"
 
-#define TEST_VERSION "${VERSION}"
+#define TEST_VERSION                                                                               \
+    ((((uint32_t)(TEST_VERSION_BUILD)) << 29U) | (((uint32_t)(TEST_VERSION_MAJOR)) << 22U) |       \
+     (((uint32_t)(TEST_VERSION_MINOR)) << 12U) | ((uint32_t)(TEST_VERSION_ALTER)))
+#define TEST_VERSION_STR "${VERSION}.${VERSION_BUILD}"
 #define TEST_VERSION_MAJOR ${VERSION_MAJOR}
 #define TEST_VERSION_MINOR ${VERSION_MINOR}
 #define TEST_VERSION_ALTER ${VERSION_ALTER}
