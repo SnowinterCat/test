@@ -31,14 +31,13 @@ add_repositories("myrepo 3rd", {rootdir = os.scriptdir()})
 add_requires("out_ptr")
 -- add_requires("rapidjson")
 add_requires("cxxopts", {version = "3.x.x"})
-add_requires("nlohmann_json", {version = "3.x.x"})
 add_requires("vulkan-memory-allocator-hpp", {version = "3.1.0"})
+add_requires("tinygltf", {version = "x.x.x"})
 -- normal libraries
 add_requires("vulkansdk")
 add_requires("libsdl3", {version = "3.x.x", configs = {shared = is_config("3rd_kind", "shared"), x11 = true, wayland = true}})
 add_requires("imgui", {version = "1.x.x", configs = {shared = is_config("3rd_kind", "shared")}})
 add_requires("spdlog", {version = "1.x.x", configs = {shared = is_config("3rd_kind", "shared"), header_only = false, fmt_external = true, wchar = true, wchar_console = true}})
-add_requires("fx-gltf", {version = "x.x.x", configs = {shared = is_config("3rd_kind", "shared")}})
 -- normal libraries' dependencies configurations
 add_requireconfs("**.vulkan-memory-allocator", {override = true, version = "3.1.0"})
 add_requireconfs("**.vulkan-headers", {override = true, version = "1.3.296"})
@@ -47,6 +46,7 @@ add_requireconfs("**.libx11", {system = true})      -- from libsdl3
 add_requireconfs("**.wayland", {system = true})     -- from libsdl3
 add_requireconfs("**.fmt", {override = true, version = "11.0.x", configs = {shared = is_config("3rd_kind", "shared"), header_only = false}})
 add_requireconfs("**.nlohmann_json", {override = true, version = "3.x.x"})
+add_requireconfs("**.stb", {override = true, version = "x.x.x"})
 
 includes("src/*/xmake.lua")
 includes("exec/*/xmake.lua")
