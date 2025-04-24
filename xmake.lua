@@ -28,8 +28,6 @@ includes("lua/pack.lua")
 -- some third-libraries use our own configurations
 add_repositories("myrepo 3rd", {rootdir = os.scriptdir()})
 -- header-only libraries
-add_requires("out_ptr")
--- add_requires("rapidjson")
 add_requires("cxxopts", {version = "3.x.x"})
 add_requires("vulkan-memory-allocator-hpp", {version = "3.1.0"})
 add_requires("tinygltf", {version = "x.x.x"})
