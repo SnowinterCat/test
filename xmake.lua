@@ -4,7 +4,7 @@ set_version("0.0.1", {build = "$(buildversion)"})
 
 -- 全局设置
 set_warnings("allextra")
-set_languages("cxx23", "c23")
+set_languages(get_config("stdc"), get_config("stdcxx"))
 set_exceptions("cxx")
 set_encodings("utf-8")
 set_policy("package.cmake_generator.ninja", true)
@@ -14,10 +14,21 @@ add_rules("mode.release", "mode.debug", "mode.releasedbg", "mode.minsizerel")
 add_rules("plugin.compile_commands.autoupdate", {lsp = "clangd", outputdir = ".vscode"})
 
 -- 编译设置
+option("stdc",   {showmenu = true, default = "c23", values = {"c23", "c17"}})
+option("stdcxx", {showmenu = true, default = "cxx23", values = {"cxx23", "cxx20", "cxx17"}})
+
 option("3rd_kind",     {showmenu = true, default = "shared", values = {"static", "shared"}})
 option("buildversion", {showmenu = true, default = "0", type = "string"})
 option("outputdir",    {showmenu = true, default = path.join(os.projectdir(), "bin"), type = "string"})
 option("luanch",       {showmenu = true, default = nil, type = "string"})   -- 调试时，设置此值为要调试的组件名即可
+
+includes("@builtin/check")
+check_cxxsnippets("has_std_outptr", [[
+    void func() {
+        std::unique_ptr<int> a;
+        (void)std::out_ptr(a);
+    }
+]], {name = "has_std_outptr", languages = get_config("stdcxx"), includes = "memory"})
 
 -- 隐藏设置、隐藏目标、打包命令
 includes("lua/hideoptions.lua")
@@ -28,6 +39,9 @@ includes("lua/pack.lua")
 -- some third-libraries use our own configurations
 add_repositories("myrepo 3rd", {rootdir = os.scriptdir()})
 -- header-only libraries
+if not get_config("has_std_outptr") then
+    add_requires("out_ptr")
+end
 add_requires("cxxopts", {version = "3.x.x"})
 add_requires("vulkan-memory-allocator-hpp", {version = "3.1.0"})
 add_requires("tinygltf", {version = "x.x.x"})
