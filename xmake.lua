@@ -47,6 +47,9 @@ add_repositories("myrepo 3rd", {rootdir = os.scriptdir()})
 if not get_config("has_std_outptr") then
     add_requires("out_ptr")
 end
+if not get_config("has_std_expected") then
+    add_requires("tl_expected")
+end
 add_requires("cxxopts", {version = "3.x.x"})
 add_requires("vulkan-memory-allocator-hpp", {version = "3.1.0"})
 add_requires("tinygltf", {version = "x.x.x"})
