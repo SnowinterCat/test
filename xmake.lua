@@ -29,6 +29,11 @@ check_cxxsnippets("has_std_outptr", [[
         (void)std::out_ptr(a);
     }
 ]], {name = "has_std_outptr", languages = get_config("stdcxx"), includes = "memory"})
+check_cxxsnippets("has_std_expected", [[
+    auto func() -> std::expected<void, int> {
+        return {};
+    }
+]], {name = "has_std_expected", languages = get_config("stdcxx"), includes = "expected"})
 
 -- 隐藏设置、隐藏目标、打包命令
 includes("lua/hideoptions.lua")
