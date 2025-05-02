@@ -3,8 +3,17 @@ set_project("test")
 set_version("0.0.1", {build = "$(buildversion)"})
 
 -- 全局设置
+option("stdc",   {showmenu = true, default = 23, values = {23, 17}})
+option("stdcxx", {showmenu = true, default = 23, values = {23, 20, 17}})
+function stdc_ver() 
+    return get_config("stdc") and "c" .. get_config("stdc") or nil
+end
+function stdcxx_ver() 
+    return get_config("stdcxx") and "cxx" .. get_config("stdcxx") or nil
+end
+
 set_warnings("allextra")
-set_languages(get_config("stdc"), get_config("stdcxx"))
+set_languages(stdc_ver("stdc"), stdcxx_ver("stdcxx"))
 set_exceptions("cxx")
 set_encodings("utf-8")
 set_policy("package.cmake_generator.ninja", true)
@@ -14,9 +23,6 @@ add_rules("mode.release", "mode.debug", "mode.releasedbg", "mode.minsizerel")
 add_rules("plugin.compile_commands.autoupdate", {lsp = "clangd", outputdir = ".vscode"})
 
 -- 编译设置
-option("stdc",   {showmenu = true, default = "c23", values = {"c23", "c17"}})
-option("stdcxx", {showmenu = true, default = "cxx23", values = {"cxx23", "cxx20", "cxx17"}})
-
 option("3rd_kind",     {showmenu = true, default = "shared", values = {"static", "shared"}})
 option("buildversion", {showmenu = true, default = "0", type = "string"})
 option("outputdir",    {showmenu = true, default = path.join(os.projectdir(), "bin"), type = "string"})
@@ -28,12 +34,12 @@ check_cxxsnippets("has_std_outptr", [[
         std::unique_ptr<int> a;
         (void)std::out_ptr(a);
     }
-]], {name = "has_std_outptr", languages = get_config("stdcxx"), includes = "memory"})
+]], {name = "has_std_outptr", languages = stdcxx_ver("stdcxx"), includes = "memory"})
 check_cxxsnippets("has_std_expected", [[
     auto func() -> std::expected<void, int> {
         return {};
     }
-]], {name = "has_std_expected", languages = get_config("stdcxx"), includes = "expected"})
+]], {name = "has_std_expected", languages = stdcxx_ver("stdcxx"), includes = "expected"})
 
 -- 隐藏设置、隐藏目标、打包命令
 includes("lua/hideoptions.lua")
