@@ -9,11 +9,11 @@ function stdc_ver()
     return get_config("stdc") and "c" .. get_config("stdc") or nil
 end
 function stdcxx_ver() 
-    return get_config("stdcxx") and "cxx" .. get_config("stdcxx") or nil
+    return get_config("stdcxx") and "c++" .. get_config("stdcxx") or nil
 end
 
 set_warnings("allextra")
-set_languages(stdc_ver("stdc"), stdcxx_ver("stdcxx"))
+set_languages(stdc_ver(), stdcxx_ver())
 set_exceptions("cxx")
 set_encodings("utf-8")
 set_policy("package.cmake_generator.ninja", true)
@@ -29,17 +29,8 @@ option("outputdir",    {showmenu = true, default = path.join(os.projectdir(), "b
 option("luanch",       {showmenu = true, default = nil, type = "string"})   -- 调试时，设置此值为要调试的组件名即可
 
 includes("@builtin/check")
-check_cxxsnippets("has_std_outptr", [[
-    void func() {
-        std::unique_ptr<int> a;
-        (void)std::out_ptr(a);
-    }
-]], {name = "has_std_outptr", languages = stdcxx_ver("stdcxx"), includes = "memory"})
-check_cxxsnippets("has_std_expected", [[
-    auto func() -> std::expected<void, int> {
-        return {};
-    }
-]], {name = "has_std_expected", languages = stdcxx_ver("stdcxx"), includes = "expected"})
+check_macros("has_std_out_ptr",  "__cpp_lib_out_ptr",  {name = "has_std_out_ptr", languages = stdcxx_ver(), includes = "memory"})
+check_macros("has_std_expected", "__cpp_lib_expected", {name = "has_std_expected", languages = stdcxx_ver(), includes = "expected"})
 
 -- 隐藏设置、隐藏目标、打包命令
 includes("lua/hideoptions.lua")
@@ -50,7 +41,7 @@ includes("lua/pack.lua")
 -- some third-libraries use our own configurations
 add_repositories("myrepo 3rd", {rootdir = os.scriptdir()})
 -- header-only libraries
-if not get_config("has_std_outptr") then
+if not get_config("has_std_out_ptr") then
     add_requires("out_ptr")
 end
 if not get_config("has_std_expected") then
