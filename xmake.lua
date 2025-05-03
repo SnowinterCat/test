@@ -31,6 +31,7 @@ option("luanch",       {showmenu = true, default = nil, type = "string"})   -- �
 includes("@builtin/check")
 check_macros("has_std_out_ptr",  "__cpp_lib_out_ptr",  {name = "has_std_out_ptr", languages = stdcxx_ver(), includes = "memory"})
 check_macros("has_std_expected", "__cpp_lib_expected", {name = "has_std_expected", languages = stdcxx_ver(), includes = "expected"})
+check_macros("has_std_runtime_format", "__cpp_lib_format >= 202311L", {name = "has_std_runtime_format", languages = stdcxx_ver(), includes = "format"})
 
 -- 隐藏设置、隐藏目标、打包命令
 includes("lua/hideoptions.lua")
@@ -54,7 +55,7 @@ add_requires("tinygltf", {version = "x.x.x"})
 add_requires("vulkansdk")
 add_requires("libsdl3", {version = "3.x.x", configs = {shared = is_config("3rd_kind", "shared"), x11 = true, wayland = true}})
 add_requires("imgui", {version = "1.x.x", configs = {shared = is_config("3rd_kind", "shared")}})
-add_requires("spdlog", {version = "1.x.x", configs = {shared = is_config("3rd_kind", "shared"), header_only = false, fmt_external = true, wchar = true, wchar_console = true}})
+add_requires("spdlog", {version = "1.x.x", configs = {shared = is_config("3rd_kind", "shared"), header_only = false, fmt_external = not has_config("has_std_runtime_format"), std_format = has_config("has_std_runtime_format"), wchar = true, wchar_console = true}})
 -- normal libraries' dependencies configurations
 add_requireconfs("**.vulkan-memory-allocator", {override = true, version = "3.1.0"})
 add_requireconfs("**.vulkan-headers", {override = true, version = "1.3.296"})
