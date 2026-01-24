@@ -5,55 +5,85 @@
 ## How to build?
 Test is built using xmake, for a related xmake tutorial check out [xmake-io](https://xmake.io/).
 
-### before build
+### Before build
 
 Some of the dependencies of this project are system libraries (e.g. libx11-dev) or third-party libraries that you need to install by yourself (e.g. vulkansdk, pkg-config). You need to install them before configuring with xmake.
 
 Of course, if some of the 3rd-party libraries that can be installed from xmake witch you also want to use the ones from system, you can also use the xmake configuration after installing them.
 
-But the following must be installed by yourself, here is an example for ubuntu 24.04:
-```
-wget -qO - https://packages.lunarg.com/lunarg-signing-key-pub.asc | sudo apt-key add -
-sudo wget -qO /etc/apt/sources.list.d/lunarg-vulkan-1.3.296-noble.list https://packages.lunarg.com/vulkan/1.3.296/lunarg-vulkan-1.3.296-noble.list
-sudo apt update
+1. Install vulkansdk
+    ```
+    https://vulkan.lunarg.com/sdk/home
+    ```
+   - For Windows, You need to download and install vulkansdk on this webside.
+   - For Linux, You need to download the vulkansdk compressed package on this webside.
+     - After downloading, extract the files to any directory and locate the setup-env.sh file in the vulkansdk directory.
+     - Before the next step, run the following command to import the environment variables for vulkansdk. (you need to replace the path and the vulkansdk version number)
+        ```
+        . /pathto/vulkansdk/1.x.xxx.x/setup-env.sh
+        ```
+     - Run the following command to verify that the vulkansdk environment variable has been imported correctly.
+        ```
+        echo $VULKAN_SDK
+        ```
+2. Install pkg-config (Linux Only)
+   - For apt, dnf and yum package management systems
+        ```
+        sudo apt install pkg-config
+        sudo dnf install pkg-config
+        sudo yum install pkg-config
+        ```
+   - For pacman package management systems
+        ```
+        sudo pacman -S pkgconf
+        ```
+3. Install header files (Linux distributions with header files and runtime libraries separated Only)
 
-sudo apt install libx11-dev libwayland-dev libxext-dev pkg-config vulkan-sdk
-```
-For Windows it is much easier, just go to the following website, download and install vulkansdk:
-```
-https://vulkan.lunarg.com/sdk/home
-```
+    All header files for libraries related to Wayland and X11 must be installed.
 
-### configure
+    Here is an example for ubuntu 24.04:
+    ```
+    sudo apt install libx11-dev libwayland-dev libxext-dev
+    ```
 
-Before building, you need to configure the project.
+### Configure
 
-#### For windows with msvc
-```
-xmake f -p windows -a x64 -m releasedbg -k shared --runtimes=MD --3rd_kind=shared -cv
-```
-#### For windows with clang-cl
-```
-xmake f -p windows -a x64 -m releasedbg -k shared --runtimes=MD --3rd_kind=shared --toolchain=clang-cl -cv
-```
-#### For windows with mingw
-```
-xmake f -p mingw -a x86_64 -m releasedbg -k shared --runtimes=stdc++_shared --3rd_kind=shared --mingw=/path_of_mingw -cv
-```
-#### For linux with gcc
-```
-xmake f -p linux -a x86_64 -m releasedbg -k shared --runtimes=stdc++_shared --3rd_kind=shared -cv
-```
-#### For linux with gcc-13
-```
-xmake f -p linux -a x86_64 -m releasedbg -k shared --runtimes=stdc++_shared --3rd_kind=shared --toolchain=gcc-13 -cv
-```
-#### For linux with llvm
-```
-xmake f -p linux -a x86_64 -m releasedbg -k shared --runtimes=stdc++_shared --3rd_kind=shared --toolchain=llvm -cv
-```
+1. Windows
+   - Use msvc
+        ```
+        xmake f -p windows -a x64 -m releasedbg -k shared --3rd_kind=shared --runtimes=MD -cv
+        ```
+   - Use clang-cl
+        ```
+        xmake f -p windows -a x64 -m releasedbg -k shared --3rd_kind=shared --runtimes=MD --toolchain=clang-cl -cv
+        ```
+   - Use mingw with libstdc++
+        ```
+        xmake f -p mingw -a x86_64 -m releasedbg -k shared --3rd_kind=shared --runtimes=stdc++_shared --mingw=/path_of_mingw -cv
+        ```
+   - Use mingw with stdc++
+        ```
+        xmake f -p mingw -a x86_64 -m releasedbg -k shared --3rd_kind=shared --runtimes=c++_shared --mingw=/path_of_mingw -cv
+        ```
+2. Linux
+   - Use gcc with libstdc++
+        ```
+        xmake f -p linux -a x86_64 -m releasedbg -k shared --3rd_kind=shared --runtimes=stdc++_shared -cv
+        ```
+   - Use gcc-13 with libstdc++
+        ```
+        xmake f -p linux -a x86_64 -m releasedbg -k shared --3rd_kind=shared --runtimes=stdc++_shared --toolchain=gcc-13 -cv
+        ```
+   - Use clang with libstdc++
+        ```
+        xmake f -p linux -a x86_64 -m releasedbg -k shared --3rd_kind=shared --runtimes=stdc++_shared --toolchain=clang -cv
+        ```
+   - Use clang with stdc++
+        ```
+        xmake f -p linux -a x86_64 -m releasedbg -k shared --3rd_kind=shared --runtimes=c++_shared --toolchain=clang -cv
+        ```
 
-### compile
+### Compile
 
 After configure, it's time to compile this project with this command:
 ```
