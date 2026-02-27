@@ -17,7 +17,7 @@
 //   engine/app code.
 // Read comments in imgui_impl_vulkan.h.
 
-#include <test/config.h>
+#include <test/config.hpp>
 
 #include "imgui.h"
 #include "imgui_impl_sdl3.h"
@@ -40,7 +40,7 @@
 
 #include "luancher/u8main.hpp"
 
-// #define APP_USE_UNLIMITED_FRAME_RATE
+#define APP_USE_UNLIMITED_FRAME_RATE
 #ifdef _DEBUG
     #define APP_USE_VULKAN_DEBUG_REPORT
 #endif

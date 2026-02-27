@@ -1,6 +1,6 @@
 #ifndef _TEST_3RDWRAP_LIBRARY_H_
 #define _TEST_3RDWRAP_LIBRARY_H_
-#include <test/config.h>
+#include <test/config.hpp>
 
 #if defined(_WIN32) && defined(TEST_3RDWRAP_DLL)
     #if defined(TEST_3RDWRAP_EXPORTS)

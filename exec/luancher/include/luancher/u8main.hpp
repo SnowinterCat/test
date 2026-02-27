@@ -1,5 +1,5 @@
 #pragma once
-#include <test/config.h>
+#include <test/config.hpp>
 
 #if defined(_WIN32)
     #define TEST_EXPORT_API __declspec(dllexport)

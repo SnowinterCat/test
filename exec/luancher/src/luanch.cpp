@@ -1,4 +1,4 @@
-#include <test/config.h>
+#include <test/config.hpp>
 #include "luanch.hpp"
 // 系统库
 #if defined(_WIN32)

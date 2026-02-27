@@ -1,5 +1,5 @@
 #pragma once
-#include <test/config.h>
+#include <test/config.hpp>
 
 #include <string>
 #include <vector>
