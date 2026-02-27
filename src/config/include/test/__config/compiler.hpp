@@ -1,13 +1,19 @@
-#ifndef _TEST_COMPILER_H_
-#define _TEST_COMPILER_H_
+#pragma once
+#include <version>
 
-#ifdef _MSVC_LANG
+// C++ library
+#ifdef _MSVC_STL_VERSION
+    // msvc stl
+    #define TEST_STL_MSVC
     #ifndef _CRT_SECURE_NO_WARNINGS
         #define _CRT_SECURE_NO_WARNINGS
     #endif
-    #ifndef _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING
-        #define _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING
-    #endif
-#endif
-
+#elif defined(_LIBCPP_VERSION)
+    // libc++
+    #define TEST_STL_LIBCXX
+#elif defined(__GLIBCXX__)
+    // libstdc++
+    #define TEST_STL_STDCXX
+#else
+    #error "not support other stl"
 #endif

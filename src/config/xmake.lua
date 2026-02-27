@@ -6,9 +6,12 @@ target("config")
     -- add_headerfiles("src/(**.hpp)", {install = false})
     -- add_files("src/**.cpp")
 
-    set_configdir("include/test")
-    if has_config("luanch") then
-        set_configvar("TEST_LUANCH", get_config("luanch"))
-    end
-    add_configfiles("config.h.in", {public = true})
+    set_configdir("include/" .. tostring(get_config("alias")))
+    on_load(function (target)
+        local aliasUpper = string.upper(get_config("alias"))
+        target:set("configvar", aliasUpper .. "_LUANCH",        get_config("luanch"))
+        target:set("configvar", aliasUpper .. "_SHARED_BUILD",  is_config("kind", "shared") and true or false)
+        -- print(target:get("configvar"))
+    end)
+    add_configfiles("*.in", {public = true})
 target_end()

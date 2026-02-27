@@ -1,10 +1,7 @@
-#ifndef _TEST_CONGIG_H_
-#define _TEST_CONGIG_H_
-
-#include "os.h"
-#include "host.h"
-#include "target.h"
-#include "compiler.h"
+#pragma once
+#include <test/__config/os.hpp>
+#include <test/__config/compiler.hpp>
+#include <test/__config/platform.hpp>
 
 #define TEST_VERSION                                                                               \
     ((((uint32_t)(TEST_VERSION_BUILD)) << 29U) | (((uint32_t)(TEST_VERSION_MAJOR)) << 22U) |       \
@@ -20,11 +17,10 @@
 #define TEST_DEBUG ${DEBUG}
 #define TEST_OS "${OS}"
 
+${define TEST_SHARED_BUILD}
 ${define TEST_LUANCH}
 
 #define TEST_BEGIN                                                                                 \
     namespace test                                                                                 \
     {
 #define TEST_END }
-
-#endif
