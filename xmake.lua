@@ -8,8 +8,8 @@ set_configvar("LEGAL_COPYRIGHT", "Copyright (C) 2024 SnowinterCat")
 set_configvar("PROJECT_NAME", "Test")
 
 -- 全局设置
-option("stdc",   {showmenu = true, default = 23, values = {23, 17}})
-option("stdcxx", {showmenu = true, default = 23, values = {26, 23, 20}})
+option("stdc",   {showmenu = true, default = 23, values = {23}})
+option("stdcxx", {showmenu = true, default = 26, values = {26, 23}})
 function stdc()   return "c"   .. tostring(get_config("stdc"))   end
 function stdcxx() return "c++" .. tostring(get_config("stdcxx")) end
 
@@ -23,12 +23,12 @@ add_rules("mode.release", "mode.debug", "mode.releasedbg", "mode.minsizerel")
 add_rules("plugin.compile_commands.autoupdate", {lsp = "clangd", outputdir = ".vscode"})
 
 -- 编译设置
-option("3rd_custom",   {showmenu = true, default = false, type = "boolean"})
-option("3rd_kind",     {showmenu = true, default = get_config("kind"), values = {"static", "shared"}})
-option("3rd_mode",     {showmenu = true, default = "release", values = {"release", "debug"}})
-option("outputdir",    {showmenu = true, default = path.join(os.projectdir(), "bin"), type = "string"})
-option("buildversion", {showmenu = true, default = 0,   type = "number"})
-option("luanch",       {showmenu = true, default = nil, type = "string"})   -- 调试时，设置此值为要调试的组件名即可
+option("3rd_custom",   {showmenu = true, type = "boolean", default = false})
+option("3rd_kind",     {showmenu = true, type = "string",  default = get_config("kind"), values = {"static", "shared"}})
+option("3rd_mode",     {showmenu = true, type = "string",  default = "release",          values = {"release", "debug"}})
+option("outputdir",    {showmenu = true, type = "string",  default = path.join(os.projectdir(), "bin")})
+option("buildversion", {showmenu = true, type = "number",  default = 0})
+option("luanch",       {showmenu = true, type = "string",  default = nil})   -- 调试时，设置此值为要调试的组件名即可
 
 includes("lua/check")
 check_macros("has_std_out_ptr",         "__cpp_lib_out_ptr",            {languages = stdcxx(), includes = "version"})
@@ -45,16 +45,18 @@ add_repositories("myrepo 3rd", {rootdir = os.scriptdir()})
 -- detected libraries
 if not is_plat("android") then add_requires("vulkansdk") end
 -- header-only libraries
-if not has_config("has_std_out_ptr") then add_requires("out_ptr") end
-if not has_config("has_std_expected") then add_requires("tl_expected") end
+if not has_config("has_std_out_ptr")  then add_requires("out_ptr") end
+if not has_config("has_std_expected") then add_requires("zeus_expected") end
 add_requires("tinygltf", "vulkan-memory-allocator-hpp", "cxxopts")
 -- normal libraries
 if not has_config("has_std_runtime_format") then add_requires("fmt") end
 add_requires("spdlog", "libsdl3", "imgui")
--- configurations of required libraries
+
+
 if not has_config("3rd_custom") then
+-- configurations of required libraries
 add_requireconfs("**out_ptr",       {override = true, version = "x.x.x"})
-add_requireconfs("**tl_expected",   {override = true, version = "x.x.x"})
+add_requireconfs("**zeus_expected", {override = true, version = "x.x.x"})
 add_requireconfs("**tinygltf",      {override = true, version = "x.x.x"})
 add_requireconfs("**vulkan-memory-allocator-hpp", {override = true, version = "3.1.0"})
 add_requireconfs("**cxxopts",       {override = true, version = "x.x.x"})
@@ -62,9 +64,7 @@ add_requireconfs("**fmt",           {override = true, version = "x.x.x", configs
 add_requireconfs("**spdlog",        {override = true, version = "x.x.x", configs = {shared = is_config("3rd_kind", "shared"), debug = is_config("3rd_mode", "debug"), header_only = false, fmt_external = not has_config("has_std_runtime_format"), std_format = has_config("has_std_runtime_format"), wchar = true, wchar_console = true}})
 add_requireconfs("**libsdl3",       {override = true, version = "x.x.x", configs = {shared = is_config("3rd_kind", "shared"), debug = is_config("3rd_mode", "debug"), x11 = true, wayland = true}})
 add_requireconfs("**imgui",         {override = true, version = "x.x.x", configs = {shared = is_config("3rd_kind", "shared"), debug = is_config("3rd_mode", "debug")}})
-end
 -- configurations of dependency libraries
-if not has_config("3rd_custom") then
 add_requireconfs("**nlohmann_json", {override = true, version = "x.x.x"})   -- from tinygltf
 add_requireconfs("**stb",           {override = true, version = "x.x.x"})   -- from tinygltf
 add_requireconfs("**vulkan-memory-allocator", {override = true, version = "3.1.0"}) -- from vulkan-memory-allocator-hpp
