@@ -1,4 +1,3 @@
-#include <test/config.hpp>
 #include "test/core/environment.hpp"
 
 #include <codecvt>

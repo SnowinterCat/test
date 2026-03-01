@@ -1,4 +1,4 @@
 #pragma once
-#include <test/core/core_library.h>
+#include <test/__core/__config.hpp>
 
 #include <test/core/environment.hpp>
