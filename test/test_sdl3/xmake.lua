@@ -2,8 +2,8 @@ target("test_sdl3")
     set_kind("shared")
     set_targetdir("$(testdir)")
 
-    add_deps("luancher")
-    add_packages("spdlog", "libsdl3")
+    add_deps("luancher", "wsi")
+    add_packages("spdlog")
 
     -- add_includedirs("include", {public = true})
     -- add_headerfiles("include/(**)")
