@@ -1,6 +1,6 @@
 #ifndef _TEST_3RDWRAP_VULKAN_LIBRARY_H_
 #define _TEST_3RDWRAP_VULKAN_LIBRARY_H_
-#include <test/3rdwrap/3rdwrap_library.h>
+#include <test/__3rdwrap/__config.hpp>
 
 #define TEST_VULKAN_BEGIN                                                                          \
     namespace vk                                                                                   \
