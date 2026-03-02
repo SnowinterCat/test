@@ -2,7 +2,7 @@ target("test_vulkan")
     set_kind("shared")
     set_targetdir("$(testdir)")
 
-    add_deps("luancher", "3rdwrap")
+    add_deps("luancher", "wsi", "rhi")
     add_packages("spdlog", "imgui")
 
     -- add_includedirs("include", {public = true})
