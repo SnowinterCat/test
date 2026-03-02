@@ -6,7 +6,8 @@ target("rhi")
     add_packages(
         -- has_config("has_std_out_ptr")        and nil or "out_ptr",
         -- has_config("has_std_expected")       and nil or "zeus_expected",
-        "libsdl3"
+        is_plat("android") and nil or "vulkansdk",
+        {public = true}
     )
 
     add_includedirs("include", {public = true})

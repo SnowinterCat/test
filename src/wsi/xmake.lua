@@ -6,7 +6,8 @@ target("wsi")
     add_packages(
         -- has_config("has_std_out_ptr")        and nil or "out_ptr",
         -- has_config("has_std_expected")       and nil or "zeus_expected",
-        "libsdl3"
+        "libsdl3",
+        {public = true}
     )
 
     add_includedirs("include", {public = true})
